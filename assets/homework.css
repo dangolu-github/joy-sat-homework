@@ -1,0 +1,118 @@
+:root {
+  --portal-ink: #20211f;
+  --portal-muted: #686b65;
+  --portal-paper: #f5f2ea;
+  --portal-surface: #fffdf8;
+  --portal-line: #d8d4ca;
+  --portal-accent: #b84f31;
+  --portal-accent-dark: #8c3822;
+  --portal-green: #526d5b;
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--portal-paper) !important; color: var(--portal-ink) !important; }
+body.portal-ready { padding-top: 82px; }
+body.portal-submitted main { opacity: .76; }
+
+.portal-bar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 100;
+  min-height: 66px;
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(280px, 520px) minmax(160px, 1fr);
+  gap: 24px;
+  align-items: center;
+  padding: 12px max(20px, calc((100vw - 1180px) / 2));
+  background: rgba(255, 253, 248, .96);
+  border-bottom: 1px solid var(--portal-line);
+  backdrop-filter: blur(12px);
+}
+
+.portal-brand { color: var(--portal-ink); text-decoration: none; font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.portal-progress { min-width: 0; }
+.portal-progress-row { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 7px; color: var(--portal-muted); font-size: 12px; }
+.portal-track { height: 7px; overflow: hidden; border-radius: 999px; background: #e6e1d7; }
+.portal-fill { width: 0; height: 100%; background: var(--portal-accent); border-radius: inherit; transition: transform .25s ease; transform: scaleX(0); transform-origin: left; }
+.portal-save { justify-self: end; color: var(--portal-green); font-size: 12px; font-weight: 700; }
+
+body.portal-ready main { max-width: 980px; box-shadow: 0 18px 60px rgba(55, 48, 36, .08) !important; }
+body.portal-ready h1 { color: var(--portal-ink) !important; letter-spacing: -.035em; }
+body.portal-ready .directions { background: #f1ede3 !important; border-left-color: var(--portal-accent) !important; }
+body.portal-ready .question { border-color: var(--portal-line) !important; border-radius: 16px !important; padding: 26px !important; transition: border-color .2s ease, transform .2s ease; }
+body.portal-ready .question:focus-within { border-color: var(--portal-accent) !important; transform: translateY(-1px); }
+body.portal-ready .badge { color: var(--portal-accent-dark) !important; background: #f8e9e3 !important; border-color: #e4b7a8 !important; }
+
+body.portal-ready .choices { grid-template-columns: 1fr !important; gap: 10px !important; }
+body.portal-ready .choice {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 14px 15px !important;
+  border: 1px solid #ded9ce !important;
+  border-radius: 10px !important;
+  background: var(--portal-surface);
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, transform .15s ease;
+}
+body.portal-ready .choice:hover { border-color: #b9b1a3 !important; transform: translateY(-1px); }
+body.portal-ready .choice.is-selected { border-color: var(--portal-accent) !important; background: #fff4ef; }
+body.portal-ready .choice input { width: 19px; height: 19px; margin: 2px 0 0; accent-color: var(--portal-accent); }
+body.portal-ready .choice:has(input:focus-visible) { outline: 3px solid var(--portal-ink); outline-offset: 2px; }
+.choice-body { min-width: 0; }
+
+.reasoning { margin-top: 15px; border-top: 1px solid #e7e2d8; padding-top: 14px; }
+.reasoning summary { color: var(--portal-muted); cursor: pointer; font-weight: 700; font-size: 13px; }
+.reasoning-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 15px; }
+.reasoning-field { display: grid; gap: 6px; }
+.reasoning-field:last-child { grid-column: 1 / -1; }
+.reasoning-field label { color: var(--portal-muted); font-size: 12px; font-weight: 700; }
+.reasoning-field textarea {
+  width: 100%; min-height: 76px; resize: vertical; padding: 11px 12px;
+  border: 1px solid #d8d2c7; border-radius: 8px; background: white; color: var(--portal-ink);
+  font: inherit; font-size: 14px; line-height: 1.45;
+}
+.reasoning-field textarea:focus-visible { outline: 3px solid var(--portal-ink); outline-offset: 2px; border-color: transparent; }
+
+.portal-submit-zone { max-width: 980px; margin: 26px auto 80px; padding: 30px; background: var(--portal-ink); color: white; border-radius: 18px; }
+.portal-submit-zone h2 { margin: 0 0 8px; font-size: 26px; }
+.portal-submit-zone p { margin: 0; color: #d2d3cf; }
+.portal-submit-row { display: flex; gap: 16px; align-items: center; justify-content: space-between; margin-top: 24px; }
+.portal-submit {
+  border: 0; border-radius: 9px; padding: 14px 20px; color: white; background: var(--portal-accent);
+  font: inherit; font-weight: 800; cursor: pointer; transition: transform .16s ease, background .16s ease;
+}
+.portal-submit:hover { background: #cf6240; }
+.portal-submit:active { transform: scale(.98); }
+.portal-submit:focus-visible { outline: 3px solid white; outline-offset: 3px; }
+.portal-submit:disabled { cursor: not-allowed; opacity: .55; }
+.portal-unanswered { font-size: 13px; color: #d2d3cf; }
+.portal-unanswered.has-gaps { color: #ffd3c4; }
+
+.portal-message { position: fixed; z-index: 130; right: 22px; bottom: 22px; max-width: 390px; padding: 16px 18px; border-radius: 10px; color: white; background: var(--portal-ink); box-shadow: 0 18px 50px rgba(0, 0, 0, .2); }
+.portal-message[hidden] { display: none; }
+
+@media (max-width: 720px) {
+  body.portal-ready { padding-top: 104px; }
+  .portal-bar { grid-template-columns: 1fr auto; gap: 10px 16px; padding: 12px 16px; }
+  .portal-progress { grid-column: 1 / -1; grid-row: 2; }
+  .portal-save { grid-column: 2; grid-row: 1; }
+  body.portal-ready main { margin: 0 !important; padding: 28px 17px 46px !important; }
+  body.portal-ready .question { padding: 19px 16px !important; }
+  .reasoning-grid { grid-template-columns: 1fr; }
+  .reasoning-field:last-child { grid-column: auto; }
+  .portal-submit-zone { margin: 18px 12px 42px; padding: 24px 20px; }
+  .portal-submit-row { align-items: stretch; flex-direction: column; }
+  .portal-submit { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+}
+
+@media print {
+  .portal-bar, .portal-submit-zone, .portal-message { display: none !important; }
+  body.portal-ready { padding-top: 0; }
+}
