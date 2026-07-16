@@ -3,7 +3,8 @@
 
   var config = window.JOY_HOMEWORK_CONFIG || {};
   var TOTAL = 66;
-  var STORAGE_KEY = 'joy-mock-exam-2-answers';
+  var testMode = new URLSearchParams(window.location.search).get('test') === '1';
+  var STORAGE_KEY = testMode ? 'joy-mock-exam-2-answers-tina-test' : 'joy-mock-exam-2-answers-joy';
   var container = document.getElementById('answer-sessions');
   var progress = document.getElementById('mock-progress');
   var status = document.getElementById('mock-save-status');
@@ -11,6 +12,8 @@
   var state = loadState();
   var remoteTimer = null;
 
+  document.body.classList.toggle('mock-test-mode', testMode);
+  document.getElementById('mock-mode-label').textContent = testMode ? 'Teacher test page · Tina' : 'Student page · Joy';
   installPrintButton();
   renderAnswerSheet();
   restoreAnswers();
@@ -35,7 +38,8 @@
   function freshState() {
     return {
       saveId: createId(),
-      studentName: 'Joy',
+      studentName: testMode ? 'Tina' : 'Joy',
+      environment: testMode ? 'test' : 'production',
       assignmentId: 'joy-mock-exam-2',
       assignmentLabel: 'Homework 3 — Mock Exam 2',
       updatedAt: null,
@@ -46,7 +50,10 @@
   function loadState() {
     try {
       var saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      return saved && saved.answers && saved.saveId ? saved : freshState();
+      if (!saved || !saved.answers || !saved.saveId) return freshState();
+      saved.studentName = testMode ? 'Tina' : 'Joy';
+      saved.environment = testMode ? 'test' : 'production';
+      return saved;
     } catch (error) {
       return freshState();
     }
@@ -140,6 +147,7 @@
           action: 'saveMockAnswers',
           saveId: state.saveId,
           studentName: state.studentName,
+          environment: state.environment,
           assignmentId: state.assignmentId,
           assignmentLabel: state.assignmentLabel,
           updatedAt: state.updatedAt,
@@ -176,6 +184,6 @@
 
   function createId() {
     if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
-    return 'mock-exam-2-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+    return (testMode ? 'mock-exam-2-tina-test-' : 'mock-exam-2-joy-') + Date.now() + '-' + Math.random().toString(16).slice(2);
   }
 }());

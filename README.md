@@ -2,6 +2,8 @@
 
 Interactive, mobile-friendly homework pages for Joy's SAT Reading and Writing programme.
 
+Role boundary: **Joy is the student** and **Tina is the teacher**. Mock Exam 2 uses the normal URL for Joy's real work and `?test=1` for Tina's isolated testing copy.
+
 - `index.html` is the date-based student portal.
 - `2026-07-15/` contains the student handout, class-answer note, feedback space, optional PDF submission, Inferences preview, and Mock Exam 2 answer saver.
 - `class-12/` contains Homework 1, the 20-question Command of Evidence assignment.

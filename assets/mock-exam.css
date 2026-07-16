@@ -11,6 +11,7 @@
 
 .mock-instructions { display: flex; justify-content: space-between; gap: 28px; align-items: center; margin-top: 28px; padding: 18px 20px; border-left: 4px solid var(--accent); background: rgba(255, 255, 255, .58); }
 .mock-instructions strong { font-size: 13px; }
+.mock-test-mode .mock-instructions { border-left-color: #9b6a13; background: #fff8e8; }
 .mock-instructions p { max-width: 70ch; margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .mock-instructions button { flex: 0 0 auto; min-height: 40px; padding: 0 15px; color: white; border: 0; border-radius: 7px; background: var(--accent); font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; transition: transform .16s ease, background .16s ease; }
 .mock-instructions button:hover { background: #983c24; }
