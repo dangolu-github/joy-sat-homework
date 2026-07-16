@@ -4,96 +4,55 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow, noarchive">
-  <title>Joy SAT Homework</title>
-  <style>
-    :root {
-      --ink: #20211f;
-      --muted: #686b65;
-      --paper: #f5f2ea;
-      --surface: #fffdf8;
-      --line: #d8d4ca;
-      --accent: #b84f31;
-      --accent-dark: #8c3822;
-      --green: #526d5b;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100dvh;
-      color: var(--ink);
-      background: var(--paper);
-      font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
-    }
-    .shell { max-width: 1180px; margin: 0 auto; padding: 28px 28px 64px; }
-    header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-    .brand { font-size: 14px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-    .private { color: var(--muted); font-size: 13px; display: flex; align-items: center; gap: 8px; }
-    .private::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
-    .hero { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(340px, .88fr); gap: 72px; align-items: end; padding: 100px 0 72px; }
-    .eyebrow { margin: 0 0 16px; color: var(--accent); font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-    h1 { margin: 0; max-width: 720px; font-size: clamp(48px, 7vw, 86px); line-height: .94; letter-spacing: -.055em; }
-    .intro { margin: 28px 0 0; max-width: 56ch; color: var(--muted); font-size: 18px; line-height: 1.65; }
-    .assignment { border-top: 2px solid var(--ink); padding-top: 22px; }
-    .assignment-top { display: flex; justify-content: space-between; gap: 20px; align-items: start; }
-    .number { color: var(--accent); font-weight: 800; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; }
-    .status { color: var(--green); font-weight: 700; font-size: 13px; }
-    h2 { margin: 20px 0 10px; font-size: 30px; line-height: 1.12; letter-spacing: -.035em; }
-    .meta { margin: 0 0 26px; color: var(--muted); line-height: 1.65; }
-    .start {
-      display: inline-flex; align-items: center; justify-content: space-between; gap: 30px;
-      width: 100%; padding: 17px 18px; color: white; background: var(--accent);
-      text-decoration: none; font-weight: 800; border-radius: 10px;
-      transition: transform .2s ease, background .2s ease;
-    }
-    .start:hover { background: var(--accent-dark); transform: translateY(-2px); }
-    .start:active { transform: scale(.98); }
-    .start:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
-    .arrow { font-size: 22px; line-height: 1; }
-    .details { border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 34px; }
-    .detail { padding: 17px 14px 0 0; }
-    .detail + .detail { padding-left: 18px; border-left: 1px solid var(--line); }
-    .detail strong { display: block; font-size: 14px; }
-    .detail span { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; }
-    footer { padding-top: 28px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
-    @media (max-width: 820px) {
-      .shell { padding: 22px 18px 46px; }
-      .hero { grid-template-columns: 1fr; gap: 56px; padding: 70px 0 56px; }
-      h1 { font-size: clamp(46px, 14vw, 68px); }
-    }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
-  </style>
+  <title>Joy SAT Workspace</title>
+  <link rel="stylesheet" href="assets/hub.css">
 </head>
 <body>
-  <div class="shell">
-    <header>
-      <div class="brand">Joy SAT</div>
-      <div class="private">Personal homework space</div>
-    </header>
-    <main class="hero">
-      <section>
-        <p class="eyebrow">Reading &amp; Writing</p>
-        <h1>Homework that works where you do.</h1>
-        <p class="intro">Choose your answers, add short reasoning notes, and return whenever you need. Your progress is saved automatically on this device.</p>
-      </section>
-      <section class="assignment" aria-labelledby="assignment-title">
-        <div class="assignment-top">
-          <span class="number">Class 12</span>
-          <span class="status">Available now</span>
-        </div>
-        <h2 id="assignment-title">Command of Evidence</h2>
-        <p class="meta">20 official-style questions focused on direct support, challenge, quotation evidence, tables, and graphs.</p>
-        <a class="start" href="class-12/">
-          <span>Open Class 12 homework</span>
-          <span class="arrow" aria-hidden="true">→</span>
+  <div class="workspace-shell">
+    <aside class="workspace-sidebar">
+      <a class="workspace-brand" href="./"><span class="brand-mark">J</span><span>Joy SAT</span></a>
+      <div class="sidebar-section">
+        <p class="sidebar-label">Course home</p>
+        <a class="sidebar-home is-active" href="./">All class dates</a>
+      </div>
+      <nav class="date-tree" aria-label="Class dates">
+        <p class="sidebar-label">July 2026</p>
+        <a class="tree-link" href="2026-07-15/">
+          <span class="tree-date">Jul 15</span>
+          <span class="tree-title">Class 12</span>
         </a>
-        <div class="details" aria-label="Assignment details">
-          <div class="detail"><strong>20 questions</strong><span>Moderate + difficult</span></div>
-          <div class="detail"><strong>Autosaved</strong><span>On this device</span></div>
-          <div class="detail"><strong>One submission</strong><span>Review before sending</span></div>
+      </nav>
+      <p class="sidebar-note">New class dates and materials will appear here.</p>
+    </aside>
+
+    <main class="workspace-main">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Reading &amp; Writing</p>
+          <h1>Joy’s SAT workspace</h1>
+          <p class="page-intro">Every class, review resource, homework task, and feedback note—organized by date.</p>
+        </div>
+        <span class="workspace-status"><i></i> Personal course space</span>
+      </header>
+
+      <section class="month-section" aria-labelledby="july-heading">
+        <div class="section-heading">
+          <h2 id="july-heading">July 2026</h2>
+          <span>1 class</span>
+        </div>
+        <div class="date-list">
+          <a class="date-row" href="2026-07-15/">
+            <time datetime="2026-07-15"><span>Jul</span><strong>15</strong></time>
+            <div class="date-row-copy">
+              <div class="row-title-line"><h3>Class 12 · Command of Evidence</h3><span class="complete-pill">Class complete</span></div>
+              <p>Lesson handout, answer notes, interactive homework, feedback area, and PDF submission.</p>
+              <div class="row-meta"><span>5 sections</span><span>Information and Ideas</span></div>
+            </div>
+            <span class="row-arrow" aria-hidden="true">→</span>
+          </a>
         </div>
       </section>
     </main>
-    <footer>Prepared for Joy’s SAT Reading &amp; Writing programme.</footer>
   </div>
 </body>
 </html>
