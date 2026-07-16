@@ -11,6 +11,7 @@
   var saveButton = document.getElementById('save-mock-now');
   var state = loadState();
   var remoteTimer = null;
+  var resetCheckPending = false;
 
   document.body.classList.toggle('mock-test-mode', testMode);
   document.getElementById('mock-mode-label').textContent = testMode ? 'Teacher test page · Tina' : 'Student page · Joy';
@@ -19,11 +20,13 @@
   restoreAnswers();
   updateProgress();
   setStatus('Saved answers restored on this device.', 'success');
+  checkResetState();
 
   container.addEventListener('input', handleAnswerInput);
   container.addEventListener('keydown', handleAnswerKeydown);
   saveButton.addEventListener('click', function () { saveRemote(true); });
   window.addEventListener('online', function () { saveRemote(false); });
+  window.addEventListener('focus', checkResetState);
 
   function installPrintButton() {
     var printButton = document.createElement('button');
@@ -42,6 +45,7 @@
       environment: testMode ? 'test' : 'production',
       assignmentId: 'joy-mock-exam-2',
       assignmentLabel: 'Homework 3 — Mock Exam 2',
+      resetVersion: null,
       updatedAt: null,
       answers: {}
     };
@@ -180,6 +184,51 @@
     status.classList.toggle('is-saving', type === 'saving');
     status.classList.toggle('is-error', type === 'error');
     status.classList.toggle('is-success', type === 'success');
+  }
+
+  function checkResetState() {
+    if (!config.submissionEndpoint || resetCheckPending) return;
+    resetCheckPending = true;
+    jsonp('getResetState', {
+      assignmentId: state.assignmentId,
+      environment: state.environment
+    }, function (data) {
+      resetCheckPending = false;
+      if (!data || !data.ok) return;
+      var remoteVersion = Number(data.resetVersion) || 0;
+      var hasRecordedAnswers = answeredCount() > 0;
+      var needsReset = state.resetVersion === null || typeof state.resetVersion === 'undefined'
+        ? hasRecordedAnswers && remoteVersion > 0
+        : remoteVersion > Number(state.resetVersion || 0);
+      if (needsReset) {
+        state = freshState();
+        state.resetVersion = remoteVersion;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        window.location.reload();
+        return;
+      }
+      if (state.resetVersion === null || typeof state.resetVersion === 'undefined') {
+        state.resetVersion = remoteVersion;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+    }, function () {
+      resetCheckPending = false;
+    });
+  }
+
+  function jsonp(action, parameters, success, failure) {
+    var callbackName = '__joyMockPortal' + Date.now() + Math.random().toString(16).slice(2);
+    var script = document.createElement('script');
+    var timeout = setTimeout(function () { cleanup(); if (failure) failure(new Error('Timed out')); }, 9000);
+    function cleanup() { clearTimeout(timeout); delete window[callbackName]; if (script.parentNode) script.parentNode.removeChild(script); }
+    window[callbackName] = function (data) { cleanup(); success(data); };
+    script.onerror = function () { cleanup(); if (failure) failure(new Error('Unable to load')); };
+    var query = Object.keys(parameters).map(function (key) { return encodeURIComponent(key) + '=' + encodeURIComponent(parameters[key]); });
+    query.push('action=' + encodeURIComponent(action));
+    query.push('callback=' + encodeURIComponent(callbackName));
+    query.push('_=' + Date.now());
+    script.src = config.submissionEndpoint + '?' + query.join('&');
+    document.head.appendChild(script);
   }
 
   function createId() {
