@@ -1,0 +1,61 @@
+.mock-main { padding-bottom: 110px; }
+.mock-header { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 44px; align-items: end; padding: 42px 0 46px; border-bottom: 1px solid var(--line); }
+.mock-header h1 { max-width: 760px; }
+.mock-header p:not(.eyebrow) { max-width: 65ch; margin: 20px 0 0; color: var(--muted); font-size: 16px; line-height: 1.65; }
+.download-exam { display: grid; gap: 7px; min-height: 112px; align-content: end; padding: 19px; color: white; border-radius: 12px; background: var(--ink); text-decoration: none; transition: transform .16s ease, background .16s ease; }
+.download-exam:hover { background: #353630; transform: translateY(-2px); }
+.download-exam:active { transform: scale(.98); }
+.download-exam:focus-visible, .mock-instructions button:focus-visible, .answer-cell input:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.download-exam span { color: #c9cac4; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.download-exam strong { font-size: 15px; line-height: 1.35; }
+
+.mock-instructions { display: flex; justify-content: space-between; gap: 28px; align-items: center; margin-top: 28px; padding: 18px 20px; border-left: 4px solid var(--accent); background: rgba(255, 255, 255, .58); }
+.mock-instructions strong { font-size: 13px; }
+.mock-instructions p { max-width: 70ch; margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.mock-instructions button { flex: 0 0 auto; min-height: 40px; padding: 0 15px; color: white; border: 0; border-radius: 7px; background: var(--accent); font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; transition: transform .16s ease, background .16s ease; }
+.mock-instructions button:hover { background: #983c24; }
+.mock-instructions button:active { transform: scale(.98); }
+
+.answer-sheet { margin-top: 50px; }
+.answer-sheet-heading { display: flex; justify-content: space-between; gap: 24px; align-items: end; padding-bottom: 14px; border-bottom: 1px solid var(--line-dark); }
+.answer-sheet-heading h2 { margin: 0; font-size: 24px; letter-spacing: -.03em; }
+.answer-sheet-heading p { margin: 7px 0 0; color: var(--muted); font-size: 12px; }
+.answer-sheet-heading > strong { color: var(--accent); font-size: 13px; }
+.answer-session { padding: 30px 0 34px; border-bottom: 1px solid var(--line); }
+.session-heading { display: flex; justify-content: space-between; gap: 18px; align-items: baseline; margin-bottom: 16px; }
+.session-heading h3 { margin: 0; font-size: 16px; }
+.session-heading span { color: var(--soft); font-size: 11px; }
+.answer-grid { display: grid; grid-template-columns: repeat(11, minmax(52px, 1fr)); gap: 10px; }
+.answer-cell { display: grid; gap: 6px; }
+.answer-cell span { color: var(--muted); font-size: 10px; font-weight: 800; text-align: center; }
+.answer-cell input { width: 100%; min-height: 48px; padding: 0; color: var(--ink); border: 1px solid var(--line-dark); border-radius: 8px; background: var(--surface); font: inherit; font-size: 20px; font-weight: 800; text-align: center; text-transform: uppercase; transition: border-color .15s ease, background .15s ease, transform .15s ease; }
+.answer-cell input:hover { border-color: #aaa59b; }
+.answer-cell input:not(:placeholder-shown) { color: white; border-color: var(--accent); background: var(--accent); }
+.answer-cell input:active { transform: scale(.97); }
+.mock-loading { padding: 34px 0; color: var(--muted); font-size: 13px; }
+.mock-save-status { position: fixed; right: 22px; bottom: 22px; z-index: 80; max-width: 390px; padding: 13px 15px; color: var(--muted); border: 1px solid var(--line-dark); border-radius: 9px; background: rgba(255, 253, 248, .96); box-shadow: 0 16px 40px rgba(45, 39, 30, .12); font-size: 12px; line-height: 1.45; backdrop-filter: blur(10px); }
+.mock-save-status.is-saving { color: var(--accent); }
+.mock-save-status.is-error { color: #8e3527; background: #fff4ef; }
+.mock-save-status.is-success { color: var(--green); background: #f1f6f2; }
+
+@media (max-width: 900px) {
+  .answer-grid { grid-template-columns: repeat(6, minmax(48px, 1fr)); }
+}
+@media (max-width: 620px) {
+  .mock-header { grid-template-columns: 1fr; gap: 26px; padding-top: 32px; }
+  .download-exam { min-height: 96px; }
+  .mock-instructions { align-items: stretch; flex-direction: column; }
+  .answer-sheet-heading { align-items: flex-start; flex-direction: column; }
+  .answer-grid { grid-template-columns: repeat(4, minmax(48px, 1fr)); gap: 9px; }
+  .mock-save-status { right: 14px; bottom: 14px; left: 14px; max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+@media print {
+  .workspace-sidebar, .back-link, .mock-instructions, .mock-save-status { display: none !important; }
+  .workspace-shell { display: block; }
+  .workspace-main { max-width: none; padding: 0; }
+  .mock-header { padding-top: 0; }
+  .download-exam { color: var(--ink); border: 1px solid var(--line-dark); background: white; }
+}

@@ -92,7 +92,7 @@
       form.reset();
       list.innerHTML = '';
       button.textContent = 'PDFs uploaded';
-      setStatus('Upload request sent successfully. The teacher can now review your PDFs.', 'success');
+      setStatus('Upload request sent successfully. Tina can now review your PDFs.', 'success');
     } catch (error) {
       button.disabled = false;
       button.textContent = 'Try uploading again';

@@ -51,9 +51,9 @@
     var header = document.createElement('header');
     header.className = 'portal-bar';
     header.innerHTML =
-      '<a class="portal-brand" href="../">Joy SAT</a>' +
+      '<a class="portal-brand" href="' + escapeHtml(config.returnUrl || '../') + '">Joy SAT</a>' +
       '<div class="portal-progress" aria-label="Homework progress">' +
-        '<div class="portal-progress-row"><span>Class 12 progress</span><strong id="portal-count">0 of ' + questions.length + ' answered</strong></div>' +
+        '<div class="portal-progress-row"><span>' + escapeHtml(config.progressLabel || 'Homework progress') + '</span><strong id="portal-count">0 of ' + questions.length + ' answered</strong></div>' +
         '<div class="portal-track"><div class="portal-fill" id="portal-fill"></div></div>' +
       '</div>' +
       '<div class="portal-save" id="portal-save" aria-live="polite">Saved on this device</div>';
@@ -221,7 +221,7 @@
     }
 
     if (!config.submissionEndpoint) {
-      showMessage('Your answers are complete and saved. The teacher submission connection is being activated; please keep this page open on this device.');
+      showMessage('Your answers are complete and saved. Tina’s submission connection is being activated; please keep this page open on this device.');
       return;
     }
 
@@ -258,5 +258,11 @@
     message.hidden = false;
     clearTimeout(showMessage.timer);
     showMessage.timer = setTimeout(function () { message.hidden = true; }, 6500);
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, function (character) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character];
+    });
   }
 }());

@@ -7,13 +7,18 @@ body.resource-page { padding-top: 66px; }
   font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
 }
 .resource-topbar a { color: #252622; font-size: 13px; font-weight: 800; text-decoration: none; }
+.resource-actions { display: flex; align-items: center; gap: 14px; }
 .resource-topbar .resource-context { color: #6d7069; font-size: 12px; font-weight: 700; }
-.resource-topbar a:focus-visible { outline: 3px solid #252622; outline-offset: 3px; }
+.resource-topbar button { min-height: 36px; padding: 0 13px; color: white; border: 0; border-radius: 7px; background: #b84f31; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; transition: transform .16s ease, background .16s ease; }
+.resource-topbar button:hover { background: #963d25; }
+.resource-topbar button:active { transform: scale(.98); }
+.resource-topbar a:focus-visible, .resource-topbar button:focus-visible { outline: 3px solid #252622; outline-offset: 3px; }
 body.resource-page main { margin-top: 24px; }
 @media (max-width: 720px) {
   body.resource-page { padding-top: 58px; }
   .resource-topbar { min-height: 52px; padding: 9px 14px; }
-  .resource-topbar .resource-context { max-width: 48vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .resource-topbar .resource-context { display: none; }
+  .resource-actions { gap: 8px; }
   body.resource-page main { margin-top: 0; }
 }
 @media print { .resource-topbar { display: none !important; } body.resource-page { padding-top: 0; } }
