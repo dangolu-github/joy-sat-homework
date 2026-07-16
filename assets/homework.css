@@ -24,7 +24,7 @@ body.portal-submitted main { opacity: 1; }
   z-index: 100;
   min-height: 66px;
   display: grid;
-  grid-template-columns: minmax(160px, 1fr) minmax(280px, 520px) minmax(160px, 1fr);
+  grid-template-columns: minmax(160px, 1fr) minmax(280px, 520px) minmax(220px, 1fr);
   gap: 24px;
   align-items: center;
   padding: 12px max(20px, calc((100vw - 1180px) / 2));
@@ -38,7 +38,11 @@ body.portal-submitted main { opacity: 1; }
 .portal-progress-row { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 7px; color: var(--portal-muted); font-size: 12px; }
 .portal-track { height: 7px; overflow: hidden; border-radius: 999px; background: #e6e1d7; }
 .portal-fill { width: 0; height: 100%; background: var(--portal-accent); border-radius: inherit; transition: transform .25s ease; transform: scaleX(0); transform-origin: left; }
-.portal-save { justify-self: end; color: var(--portal-green); font-size: 12px; font-weight: 700; }
+.portal-actions { justify-self: end; display: flex; gap: 9px; align-items: center; }
+.portal-save { color: var(--portal-green); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.portal-pdf { min-height: 34px; padding: 0 11px; color: var(--portal-ink); border: 1px solid var(--portal-line); border-radius: 7px; background: white; font: inherit; font-size: 11px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+.portal-pdf:hover { border-color: var(--portal-accent); color: var(--portal-accent-dark); }
+.portal-pdf:focus-visible { outline: 3px solid var(--portal-ink); outline-offset: 2px; }
 
 body.portal-ready main { max-width: 980px; box-shadow: 0 18px 60px rgba(55, 48, 36, .08) !important; }
 body.portal-ready h1 { color: var(--portal-ink) !important; letter-spacing: -.035em; }
@@ -74,6 +78,7 @@ body.portal-ready .choice:has(input:focus-visible) { outline: 3px solid var(--po
 .choice-body { min-width: 0; }
 .answer-label { align-self: center; justify-self: end; border-radius: 999px; padding: 4px 8px; background: var(--portal-correct); color: white; font-size: 11px; font-weight: 800; white-space: nowrap; }
 .wrong-label { background: var(--portal-wrong); }
+.question-result-label { display: inline-flex; margin: 0 0 14px; padding: 6px 9px; border-radius: 7px; color: var(--portal-wrong); background: var(--portal-wrong-bg); font-size: 12px; font-weight: 850; }
 
 .reasoning { margin-top: 15px; border-top: 1px solid #e7e2d8; padding-top: 14px; }
 .reasoning summary { color: var(--portal-muted); cursor: pointer; font-weight: 700; font-size: 13px; }
@@ -127,7 +132,8 @@ body.portal-ready .choice:has(input:focus-visible) { outline: 3px solid var(--po
   body.portal-ready { padding-top: 104px; }
   .portal-bar { grid-template-columns: 1fr auto; gap: 10px 16px; padding: 12px 16px; }
   .portal-progress { grid-column: 1 / -1; grid-row: 2; }
-  .portal-save { grid-column: 2; grid-row: 1; }
+  .portal-actions { grid-column: 2; grid-row: 1; }
+  .portal-save { display: none; }
   body.portal-ready main { margin: 0 !important; padding: 28px 17px 46px !important; }
   body.portal-ready .question { padding: 19px 16px !important; }
   .reasoning-grid { grid-template-columns: 1fr; }

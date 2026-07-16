@@ -15,6 +15,8 @@
 .mock-instructions button { flex: 0 0 auto; min-height: 40px; padding: 0 15px; color: white; border: 0; border-radius: 7px; background: var(--accent); font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; transition: transform .16s ease, background .16s ease; }
 .mock-instructions button:hover { background: #983c24; }
 .mock-instructions button:active { transform: scale(.98); }
+.mock-instructions .mock-pdf-button { margin-left: auto; color: var(--ink); border: 1px solid var(--line-dark); background: white; }
+.mock-instructions .mock-pdf-button:hover { color: var(--accent); border-color: var(--accent); background: white; }
 
 .answer-sheet { margin-top: 50px; }
 .answer-sheet-heading { display: flex; justify-content: space-between; gap: 24px; align-items: end; padding-bottom: 14px; border-bottom: 1px solid var(--line-dark); }
@@ -45,6 +47,7 @@
   .mock-header { grid-template-columns: 1fr; gap: 26px; padding-top: 32px; }
   .download-exam { min-height: 96px; }
   .mock-instructions { align-items: stretch; flex-direction: column; }
+  .mock-instructions .mock-pdf-button { margin-left: 0; }
   .answer-sheet-heading { align-items: flex-start; flex-direction: column; }
   .answer-grid { grid-template-columns: repeat(4, minmax(48px, 1fr)); gap: 9px; }
   .mock-save-status { right: 14px; bottom: 14px; left: 14px; max-width: none; }

@@ -26,7 +26,7 @@
     return {
       assignmentId: assignmentId,
       assignmentLabel: config.assignmentLabel || document.title,
-      studentName: config.studentName || 'Joy',
+      studentName: '',
       environment: testMode ? 'test' : 'production',
       submissionId: createSubmissionId(),
       startedAt: new Date().toISOString(),
@@ -62,8 +62,12 @@
         '<div class="portal-progress-row"><span>' + escapeHtml(testMode ? 'Tina test copy' : (config.progressLabel || 'Homework progress')) + '</span><strong id="portal-count">0 of ' + questions.length + ' answered</strong></div>' +
         '<div class="portal-track"><div class="portal-fill" id="portal-fill"></div></div>' +
       '</div>' +
-      '<div class="portal-save" id="portal-save" aria-live="polite">Saved on this device</div>';
+      '<div class="portal-actions">' +
+        '<div class="portal-save" id="portal-save" aria-live="polite">Saved on this device</div>' +
+        '<button class="portal-pdf" id="portal-save-pdf" type="button">Save as PDF</button>' +
+      '</div>';
     document.body.insertBefore(header, document.body.firstChild);
+    document.getElementById('portal-save-pdf').addEventListener('click', function () { window.print(); });
   }
 
   function enhanceQuestions() {
@@ -119,8 +123,8 @@
     zone.className = 'portal-submit-zone';
     zone.innerHTML =
       '<div id="portal-result" hidden></div>' +
-      '<div id="portal-submit-copy"><h2>Ready to finish?</h2><p>Review any unanswered questions before sending your final responses.</p></div>' +
-      '<div class="portal-submit-row"><span class="portal-unanswered" id="portal-unanswered"></span><button class="portal-submit" id="portal-submit" type="button">Send completed homework</button></div>';
+      '<div id="portal-submit-copy"><h2>Ready to submit?</h2><p>You may submit with blank answers, but every unanswered question will be counted as incorrect.</p></div>' +
+      '<div class="portal-submit-row"><span class="portal-unanswered" id="portal-unanswered"></span><button class="portal-submit" id="portal-submit" type="button">Submit homework</button></div>';
     document.body.appendChild(zone);
 
     var difficulty = document.createElement('section');
@@ -213,12 +217,32 @@
       return !state.responses[number] || !state.responses[number].answer;
     });
     if (missing.length) {
-      showMessage('Please answer every question before submitting. Missing: ' + missing.join(', ') + '.');
-      questions[missing[0] - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      var proceed = window.confirm(
+        'There are still ' + missing.length + ' unanswered question' + (missing.length === 1 ? '' : 's') +
+        ': ' + missing.join(', ') + '.\n\nSubmit anyway? Every unanswered question will be marked incorrect.'
+      );
+      if (!proceed) {
+        showMessage('Submission cancelled. Your current answers are still saved on this device.');
+        questions[missing[0] - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+    }
+
+    var enteredName = window.prompt('Please type your name before submitting:', '');
+    if (enteredName === null) {
+      showMessage('Submission cancelled. Please enter your name when you are ready to submit.');
       return;
     }
+    enteredName = enteredName.trim().slice(0, 80);
+    if (!enteredName) {
+      showMessage('Please type your name before submitting.');
+      return;
+    }
+    state.studentName = enteredName;
+    saveState();
+
     if (!config.submissionEndpoint) {
-      showMessage('Your answers are complete and saved. Tina’s submission connection is being activated; please keep this page open on this device.');
+      showMessage('Your answers and name are saved. Tina’s submission connection is being activated; please keep this page open on this device.');
       return;
     }
 
@@ -301,10 +325,16 @@
         wrong.textContent = 'Your answer';
         selectedChoice.appendChild(wrong);
       }
+      if (!selected && !question.querySelector('.question-result-label')) {
+        var unanswered = document.createElement('div');
+        unanswered.className = 'question-result-label';
+        unanswered.textContent = 'Unanswered — counted incorrect';
+        question.insertBefore(unanswered, question.firstChild);
+      }
     });
     var resultBox = document.getElementById('portal-result');
     resultBox.hidden = false;
-    resultBox.innerHTML = '<span class="result-kicker">Checked instantly</span><div class="result-score"><strong>' + result.score + ' / ' + result.total + '</strong><span>' + result.percent + '% correct</span></div><p>The correct choice is highlighted for every question. Mark anything you want to review with Tina below.</p>';
+    resultBox.innerHTML = '<span class="result-kicker">Checked instantly</span><div class="result-score"><strong>' + result.score + ' / ' + result.total + '</strong><span>' + result.percent + '% correct</span></div><p>Submitted as <strong>' + escapeHtml(result.studentName || state.studentName) + '</strong>. The correct choice is highlighted for every question. Mark anything you want to review with Tina below.</p>';
     document.getElementById('portal-submit-copy').hidden = true;
     document.getElementById('portal-unanswered').textContent = testMode ? 'Tina test record' : 'Saved in Tina’s register';
     document.getElementById('portal-submit').textContent = 'Answers checked';

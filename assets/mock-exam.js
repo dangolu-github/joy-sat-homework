@@ -11,6 +11,7 @@
   var state = loadState();
   var remoteTimer = null;
 
+  installPrintButton();
   renderAnswerSheet();
   restoreAnswers();
   updateProgress();
@@ -20,6 +21,16 @@
   container.addEventListener('keydown', handleAnswerKeydown);
   saveButton.addEventListener('click', function () { saveRemote(true); });
   window.addEventListener('online', function () { saveRemote(false); });
+
+  function installPrintButton() {
+    var printButton = document.createElement('button');
+    printButton.type = 'button';
+    printButton.id = 'save-mock-pdf';
+    printButton.className = 'mock-pdf-button';
+    printButton.textContent = 'Save as PDF';
+    printButton.addEventListener('click', function () { window.print(); });
+    saveButton.parentNode.insertBefore(printButton, saveButton);
+  }
 
   function freshState() {
     return {
