@@ -3,13 +3,24 @@
 
   var config = window.JOY_HOMEWORK_CONFIG || {};
   var assignmentId = config.assignmentId || 'joy-homework';
-  var testMode = new URLSearchParams(window.location.search).get('test') === '1';
+  var query = new URLSearchParams(window.location.search);
+  var testMode = query.get('test') === '1';
+  var reviewSubmissionId = cleanReference(query.get('reviewSubmissionId'));
+  var progressSaveId = cleanReference(query.get('progressSaveId'));
+  var submittedReviewMode = Boolean(reviewSubmissionId);
+  var progressReviewMode = Boolean(progressSaveId);
+  var teacherReviewMode = submittedReviewMode || progressReviewMode;
   var storageKey = 'joy-homework:' + assignmentId + (testMode ? ':teacher-test' : '');
   var questions = Array.from(document.querySelectorAll('.question'));
-  var state = loadState();
+  var state = teacherReviewMode ? freshState() : loadState();
   var saveTimer = null;
   var flagTimer = null;
-  var submitted = Boolean(state.submittedAt);
+  var progressSyncTimer = null;
+  var progressPollTimer = null;
+  var submitted = teacherReviewMode || Boolean(state.submittedAt);
+
+  if (submittedReviewMode) state.submissionId = reviewSubmissionId;
+  if (progressReviewMode) state.submissionId = progressSaveId;
 
   if (!questions.length) return;
 
@@ -19,8 +30,16 @@
   restoreState();
   updateProgress();
   document.body.classList.add('portal-ready');
-  checkResetState();
-  if (submitted && !state.result) pollForResult(0);
+  if (submittedReviewMode) pollForResult(0);
+  else if (progressReviewMode) pollForProgressReview(0);
+  else {
+    checkResetState();
+    if (submitted && !state.result) pollForResult(0);
+    else if (!submitted && hasProgress()) scheduleProgressSync(true);
+  }
+  window.addEventListener('online', function () {
+    if (!teacherReviewMode && !submitted && hasProgress()) scheduleProgressSync(true);
+  });
 
   function freshState() {
     return {
@@ -44,6 +63,10 @@
     return assignmentId + '-' + Date.now() + '-' + Math.random().toString(16).slice(2);
   }
 
+  function cleanReference(value) {
+    return String(value || '').replace(/[^a-zA-Z0-9._:-]/g, '').slice(0, 160);
+  }
+
   function loadState() {
     try {
       var saved = JSON.parse(localStorage.getItem(storageKey));
@@ -63,7 +86,9 @@
         '<div class="portal-track"><div class="portal-fill" id="portal-fill"></div></div>' +
       '</div>' +
       '<div class="portal-actions">' +
-        '<div class="portal-save" id="portal-save" aria-live="polite">Saved on this device</div>' +
+        '<div class="portal-save" id="portal-save" aria-live="polite">' +
+          (teacherReviewMode ? (submittedReviewMode ? 'Submitted result' : 'Live synced progress') : 'Saved on this device') +
+        '</div>' +
         '<button class="portal-pdf" id="portal-save-pdf" type="button">Save as PDF</button>' +
       '</div>';
     document.body.insertBefore(header, document.body.firstChild);
@@ -177,19 +202,75 @@
   }
 
   function scheduleSave() {
+    if (teacherReviewMode) return;
     clearTimeout(saveTimer);
     document.getElementById('portal-save').textContent = 'Saving…';
     saveTimer = setTimeout(saveState, 180);
   }
 
   function saveState() {
+    if (teacherReviewMode) return;
     state.updatedAt = new Date().toISOString();
     try {
       localStorage.setItem(storageKey, JSON.stringify(state));
-      document.getElementById('portal-save').textContent = 'Saved on this device';
+      document.getElementById('portal-save').textContent = submitted ? 'Saved on this device' : 'Saved on this device · syncing with Tina…';
+      if (!submitted && hasProgress()) scheduleProgressSync(false);
     } catch (error) {
       document.getElementById('portal-save').textContent = 'Unable to save';
     }
+  }
+
+  function hasProgress() {
+    return Object.keys(state.responses || {}).some(function (number) {
+      var response = state.responses[number] || {};
+      return Boolean(response.answer || response.claim || response.evidence || response.trap);
+    });
+  }
+
+  function scheduleProgressSync(immediate) {
+    if (teacherReviewMode || submitted || !config.submissionEndpoint || !hasProgress()) return;
+    clearTimeout(progressSyncTimer);
+    progressSyncTimer = setTimeout(saveProgressRemote, immediate ? 80 : 900);
+  }
+
+  async function saveProgressRemote() {
+    if (teacherReviewMode || submitted || !config.submissionEndpoint || !hasProgress()) return;
+    var clientUpdatedAt = state.updatedAt || new Date().toISOString();
+    try {
+      var response = await fetch(config.submissionEndpoint, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'saveHomeworkProgress',
+          assignmentId: assignmentId,
+          assignmentLabel: state.assignmentLabel,
+          submissionId: state.submissionId,
+          environment: state.environment,
+          startedAt: state.startedAt,
+          updatedAt: clientUpdatedAt,
+          responses: state.responses
+        })
+      });
+      if (response.type !== 'opaque' && !response.ok) throw new Error('Progress sync failed');
+      verifyProgressSync(clientUpdatedAt, 0);
+    } catch (error) {
+      document.getElementById('portal-save').textContent = 'Saved on this device · online sync will retry';
+    }
+  }
+
+  function verifyProgressSync(clientUpdatedAt, attempt) {
+    jsonp('getHomeworkProgress', { saveId: state.submissionId, assignmentId: assignmentId }, function (data) {
+      if (data && data.ok && !data.pending && data.clientUpdatedAt === clientUpdatedAt) {
+        document.getElementById('portal-save').textContent = 'Saved on this device and with Tina';
+        return;
+      }
+      if (attempt < 3) setTimeout(function () { verifyProgressSync(clientUpdatedAt, attempt + 1); }, 800 + attempt * 500);
+      else document.getElementById('portal-save').textContent = 'Saved on this device · online sync pending';
+    }, function () {
+      if (attempt < 3) setTimeout(function () { verifyProgressSync(clientUpdatedAt, attempt + 1); }, 1200);
+      else document.getElementById('portal-save').textContent = 'Saved on this device · online sync pending';
+    });
   }
 
   function answeredNumbers() {
@@ -210,7 +291,7 @@
   }
 
   async function submitHomework() {
-    if (submitted) return;
+    if (submitted || teacherReviewMode) return;
     questions.forEach(function (_, index) { captureQuestion(index + 1); });
     saveState();
     var missing = questions.map(function (_, index) { return index + 1; }).filter(function (number) {
@@ -277,7 +358,7 @@
     });
     var button = document.getElementById('portal-submit');
     button.disabled = true;
-    button.textContent = state.result ? 'Answers checked' : 'Checking answers…';
+    button.textContent = submittedReviewMode ? 'Loading submitted review…' : (progressReviewMode ? 'Read-only live view' : (state.result ? 'Answers checked' : 'Checking answers…'));
   }
 
   function pollForResult(attempt) {
@@ -291,13 +372,74 @@
       }
       if (attempt < 12) setTimeout(function () { pollForResult(attempt + 1); }, Math.min(900 + attempt * 350, 3200));
       else {
-        document.getElementById('portal-submit').textContent = 'Submitted — refresh to see corrections';
-        showMessage('Your homework is safely submitted. Refresh this page in a moment to see the corrections.');
+        document.getElementById('portal-submit').textContent = submittedReviewMode ? 'Submitted review unavailable' : 'Submitted — refresh to see corrections';
+        showMessage(submittedReviewMode ? 'This submitted review could not be loaded.' : 'Your homework is safely submitted. Refresh this page in a moment to see the corrections.');
       }
     }, function () {
       if (attempt < 12) setTimeout(function () { pollForResult(attempt + 1); }, 1800);
-      else showMessage('Your homework is submitted. Refresh shortly to load the corrections.');
+      else showMessage(submittedReviewMode ? 'This submitted review could not be loaded.' : 'Your homework is submitted. Refresh shortly to load the corrections.');
     });
+  }
+
+  function pollForProgressReview(attempt) {
+    clearTimeout(progressPollTimer);
+    jsonp('getHomeworkProgress', { saveId: progressSaveId, assignmentId: assignmentId }, function (data) {
+      if (data && data.ok && !data.pending) {
+        renderProgressReview(data);
+        progressPollTimer = setTimeout(function () { pollForProgressReview(0); }, 5000);
+        return;
+      }
+      if (attempt < 8) progressPollTimer = setTimeout(function () { pollForProgressReview(attempt + 1); }, 1500);
+      else {
+        document.getElementById('portal-submit').textContent = 'Live progress unavailable';
+        showMessage('No synced progress was found for this link.');
+      }
+    }, function () {
+      if (attempt < 8) progressPollTimer = setTimeout(function () { pollForProgressReview(attempt + 1); }, 1800);
+      else showMessage('The live progress view could not refresh.');
+    });
+  }
+
+  function renderProgressReview(data) {
+    state.responses = data.responses || {};
+    state.studentName = data.studentName || 'Joy';
+    applyResponsesToForm();
+    updateProgress();
+    lockSubmittedPage();
+    var resultBox = document.getElementById('portal-result');
+    resultBox.hidden = false;
+    resultBox.innerHTML = '<span class="result-kicker">Live student progress</span><div class="result-score"><strong>' +
+      escapeHtml(data.answeredCount) + ' / ' + escapeHtml(data.questionCount) +
+      '</strong><span>answers currently synced</span></div><p>Read-only view of Joy’s latest saved work. This page refreshes automatically every five seconds. Last server update: <strong>' +
+      escapeHtml(formatReviewTime(data.updatedAt)) + '</strong>.</p>';
+    document.getElementById('portal-submit-copy').hidden = true;
+    document.getElementById('portal-unanswered').textContent = data.status === 'submitted' ? 'Final submission received' : 'Work still in progress';
+    document.getElementById('portal-submit').textContent = 'Read-only live view';
+    document.getElementById('difficulty-panel').hidden = true;
+  }
+
+  function applyResponsesToForm() {
+    questions.forEach(function (question, index) {
+      Array.from(question.querySelectorAll('.choice')).forEach(function (choice) {
+        var input = choice.querySelector('input');
+        input.checked = false;
+        choice.classList.remove('is-selected');
+      });
+      var response = state.responses[index + 1] || state.responses[String(index + 1)] || {};
+      if (response.answer) {
+        var input = question.querySelector('input[value="' + response.answer + '"]');
+        if (input) { input.checked = true; input.closest('.choice').classList.add('is-selected'); }
+      }
+      Array.from(question.querySelectorAll('textarea[data-field]')).forEach(function (field) {
+        field.value = response[field.dataset.field] || '';
+      });
+      Array.from(question.querySelectorAll('input, textarea')).forEach(function (field) { field.disabled = true; });
+    });
+  }
+
+  function formatReviewTime(value) {
+    var date = new Date(value);
+    return isNaN(date.getTime()) ? 'unknown' : date.toLocaleString();
   }
 
   function renderResult(result) {
@@ -307,6 +449,15 @@
       var correct = result.correctAnswers[index];
       var selectedChoice = question.querySelector('.choice[data-letter="' + selected + '"]');
       var correctChoice = question.querySelector('.choice[data-letter="' + correct + '"]');
+      if (submittedReviewMode) {
+        Array.from(question.querySelectorAll('input[type="radio"]')).forEach(function (input) { input.checked = false; });
+        if (selectedChoice) selectedChoice.querySelector('input').checked = true;
+        var reviewNote = (result.notes && (result.notes[index + 1] || result.notes[String(index + 1)])) || {};
+        Array.from(question.querySelectorAll('textarea[data-field]')).forEach(function (field) {
+          field.value = reviewNote[field.dataset.field] || '';
+          field.disabled = true;
+        });
+      }
       question.classList.toggle('question-correct', selected === correct);
       question.classList.toggle('question-wrong', selected !== correct);
       if (selectedChoice) selectedChoice.classList.add(selected === correct ? 'is-correct' : 'is-wrong');
@@ -336,10 +487,13 @@
     resultBox.hidden = false;
     resultBox.innerHTML = '<span class="result-kicker">Checked instantly</span><div class="result-score"><strong>' + result.score + ' / ' + result.total + '</strong><span>' + result.percent + '% correct</span></div><p>Submitted as <strong>' + escapeHtml(result.studentName || state.studentName) + '</strong>. The correct choice is highlighted for every question. Mark anything you want to review with Tina below.</p>';
     document.getElementById('portal-submit-copy').hidden = true;
-    document.getElementById('portal-unanswered').textContent = testMode ? 'Tina test record' : 'Saved in Tina’s register';
-    document.getElementById('portal-submit').textContent = 'Answers checked';
-    installDifficultyChoices();
-    document.getElementById('difficulty-panel').hidden = false;
+    document.getElementById('portal-unanswered').textContent = submittedReviewMode ? 'Read-only submitted review' : (testMode ? 'Tina test record' : 'Saved in Tina’s register');
+    document.getElementById('portal-submit').textContent = submittedReviewMode ? 'Read-only submitted review' : 'Answers checked';
+    if (submittedReviewMode) document.getElementById('difficulty-panel').hidden = true;
+    else {
+      installDifficultyChoices();
+      document.getElementById('difficulty-panel').hidden = false;
+    }
   }
 
   function installDifficultyChoices() {
@@ -367,7 +521,7 @@
   }
 
   async function saveDifficultyFlags() {
-    if (!config.submissionEndpoint) return;
+    if (teacherReviewMode || !config.submissionEndpoint) return;
     try {
       await fetch(config.submissionEndpoint, {
         method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -380,7 +534,7 @@
   }
 
   function checkResetState() {
-    if (!config.submissionEndpoint) return;
+    if (teacherReviewMode || !config.submissionEndpoint) return;
     jsonp('getResetState', { assignmentId: assignmentId }, function (data) {
       if (!data || !data.ok) return;
       var remoteVersion = Number(data.resetVersion) || 0;
