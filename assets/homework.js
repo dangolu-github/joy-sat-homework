@@ -401,6 +401,16 @@
   }
 
   function renderProgressReview(data) {
+    if (data.status === 'submitted') {
+      submittedReviewMode = true;
+      progressReviewMode = false;
+      state.submissionId = data.saveId || progressSaveId;
+      document.getElementById('portal-save').textContent = 'Loading submitted result…';
+      document.getElementById('portal-submit').textContent = 'Loading marks and corrections…';
+      clearTimeout(progressPollTimer);
+      pollForResult(0);
+      return;
+    }
     state.responses = data.responses || {};
     state.studentName = data.studentName || 'Joy';
     applyResponsesToForm();
@@ -444,6 +454,18 @@
 
   function renderResult(result) {
     if (!result || !Array.isArray(result.correctAnswers)) return;
+    if (submittedReviewMode) {
+      state.responses = {};
+      result.answers.forEach(function (answer, index) {
+        var note = (result.notes && (result.notes[index + 1] || result.notes[String(index + 1)])) || {};
+        state.responses[index + 1] = {
+          answer: answer || '',
+          claim: note.claim || '',
+          evidence: note.evidence || '',
+          trap: note.trap || ''
+        };
+      });
+    }
     questions.forEach(function (question, index) {
       var selected = result.answers[index];
       var correct = result.correctAnswers[index];
@@ -489,11 +511,24 @@
     document.getElementById('portal-submit-copy').hidden = true;
     document.getElementById('portal-unanswered').textContent = submittedReviewMode ? 'Read-only submitted review' : (testMode ? 'Tina test record' : 'Saved in Tina’s register');
     document.getElementById('portal-submit').textContent = submittedReviewMode ? 'Read-only submitted review' : 'Answers checked';
-    if (submittedReviewMode) document.getElementById('difficulty-panel').hidden = true;
+    updateProgress();
+    if (submittedReviewMode) renderSubmittedDifficultyFlags(result.difficultyFlags || []);
     else {
       installDifficultyChoices();
       document.getElementById('difficulty-panel').hidden = false;
     }
+  }
+
+  function renderSubmittedDifficultyFlags(flags) {
+    var panel = document.getElementById('difficulty-panel');
+    var numbers = (Array.isArray(flags) ? flags : []).map(Number).filter(function (number) {
+      return number >= 1 && number <= questions.length;
+    });
+    panel.hidden = false;
+    panel.innerHTML = '<div><span class="result-kicker">Joy’s submitted review list</span><h2>' +
+      (numbers.length ? 'Questions Joy ticked for review' : 'No questions were ticked for review') +
+      '</h2><p>' + (numbers.length ? numbers.map(function (number) { return 'Question ' + number; }).join(', ') :
+      'The Google tracker contains no active ticked-question record for this submission.') + '</p></div>';
   }
 
   function installDifficultyChoices() {
