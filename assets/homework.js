@@ -469,6 +469,8 @@
     questions.forEach(function (question, index) {
       var selected = result.answers[index];
       var correct = result.correctAnswers[index];
+      var previousExplanation = question.querySelector('.mistake-explanation');
+      if (previousExplanation) previousExplanation.remove();
       var selectedChoice = question.querySelector('.choice[data-letter="' + selected + '"]');
       var correctChoice = question.querySelector('.choice[data-letter="' + correct + '"]');
       if (submittedReviewMode) {
@@ -504,6 +506,10 @@
         unanswered.textContent = 'Unanswered — counted incorrect';
         question.insertBefore(unanswered, question.firstChild);
       }
+      if (selected !== correct && result.explainMode) {
+        var explanation = result.mistakeExplanations && (result.mistakeExplanations[index + 1] || result.mistakeExplanations[String(index + 1)]);
+        if (explanation) renderMistakeExplanation(question, explanation);
+      }
     });
     var resultBox = document.getElementById('portal-result');
     resultBox.hidden = false;
@@ -517,6 +523,67 @@
       installDifficultyChoices();
       document.getElementById('difficulty-panel').hidden = false;
     }
+  }
+
+  function renderMistakeExplanation(question, explanation) {
+    var details = document.createElement('details');
+    details.className = 'mistake-explanation';
+
+    var summary = document.createElement('summary');
+    summary.textContent = 'See mistake explanation';
+    details.appendChild(summary);
+
+    var body = document.createElement('div');
+    body.className = 'mistake-explanation-body';
+
+    var method = document.createElement('p');
+    method.className = 'mistake-method';
+    var methodLabel = document.createElement('strong');
+    methodLabel.textContent = 'Use the strategy: ';
+    method.appendChild(methodLabel);
+    method.appendChild(document.createTextNode(explanation.method || 'Direct-Fit Test'));
+    body.appendChild(method);
+
+    body.appendChild(explanationLine('Question job', explanation.questionJob));
+    body.appendChild(explanationLine('Evidence lock', explanation.textRequires));
+
+    var diff = document.createElement('div');
+    diff.className = 'mistake-diff';
+    diff.appendChild(diffLine('Your path', 'Choice ' + (explanation.selectedAnswer || '') + ' — ' + (explanation.whySelectedFails || ''), 'diff-missed', 'del'));
+    diff.appendChild(diffLine('Required path', 'Choice ' + (explanation.correctAnswer || '') + ' — ' + (explanation.correctPath || ''), 'diff-required', 'ins'));
+    body.appendChild(diff);
+
+    var takeaway = document.createElement('p');
+    takeaway.className = 'mistake-takeaway';
+    var takeawayLabel = document.createElement('strong');
+    takeawayLabel.textContent = 'Takeaway: ';
+    takeaway.appendChild(takeawayLabel);
+    takeaway.appendChild(document.createTextNode(explanation.takeaway || 'Match every condition before choosing.'));
+    body.appendChild(takeaway);
+
+    details.appendChild(body);
+    question.appendChild(details);
+  }
+
+  function explanationLine(label, value) {
+    var line = document.createElement('p');
+    var strong = document.createElement('strong');
+    strong.textContent = label + ': ';
+    line.appendChild(strong);
+    line.appendChild(document.createTextNode(value || ''));
+    return line;
+  }
+
+  function diffLine(label, value, className, tagName) {
+    var line = document.createElement('div');
+    line.className = 'mistake-diff-line ' + className;
+    var heading = document.createElement('span');
+    heading.textContent = label;
+    var annotation = document.createElement(tagName);
+    annotation.textContent = value;
+    line.appendChild(heading);
+    line.appendChild(annotation);
+    return line;
   }
 
   function renderSubmittedDifficultyFlags(flags) {
