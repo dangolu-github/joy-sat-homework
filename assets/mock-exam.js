@@ -4,7 +4,7 @@
   var config = window.JOY_HOMEWORK_CONFIG || {};
   var TOTAL = 66;
   var testMode = new URLSearchParams(window.location.search).get('test') === '1';
-  var STORAGE_KEY = testMode ? 'joy-mock-exam-2-answers-tina-test' : 'joy-mock-exam-2-answers-joy';
+  var STORAGE_KEY = testMode ? 'joy-mock-exam-2-answers-teacher-test' : 'joy-mock-exam-2-answers-joy';
   var container = document.getElementById('answer-sessions');
   var progress = document.getElementById('mock-progress');
   var status = document.getElementById('mock-save-status');
@@ -14,7 +14,7 @@
   var resetCheckPending = false;
 
   document.body.classList.toggle('mock-test-mode', testMode);
-  document.getElementById('mock-mode-label').textContent = testMode ? 'Teacher test page · Tina' : 'Student page · Joy';
+  document.getElementById('mock-mode-label').textContent = testMode ? 'Teacher test page' : 'Student page · Joy';
   installPrintButton();
   renderAnswerSheet();
   restoreAnswers();
@@ -41,7 +41,7 @@
   function freshState() {
     return {
       saveId: createId(),
-      studentName: testMode ? 'Tina' : 'Joy',
+      studentName: testMode ? 'Teacher' : 'Joy',
       environment: testMode ? 'test' : 'production',
       assignmentId: 'joy-mock-exam-2',
       assignmentLabel: 'Homework 3 — Mock Exam 2',
@@ -55,7 +55,7 @@
     try {
       var saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
       if (!saved || !saved.answers || !saved.saveId) return freshState();
-      saved.studentName = testMode ? 'Tina' : 'Joy';
+      saved.studentName = testMode ? 'Teacher' : 'Joy';
       saved.environment = testMode ? 'test' : 'production';
       return saved;
     } catch (error) {
@@ -118,7 +118,7 @@
     state.updatedAt = new Date().toISOString();
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      setStatus('Saved on this device · sending the latest changes to Tina…', 'saving');
+      setStatus('Saved on this device · sending the latest changes to Teacher…', 'saving');
     } catch (error) {
       setStatus('This browser could not save the latest change. Keep this page open and try again.', 'error');
     }
@@ -133,7 +133,7 @@
     clearTimeout(remoteTimer);
     saveLocal();
     if (!config.submissionEndpoint) {
-      setStatus('Saved on this device. Tina’s online answer record is not connected yet.', 'error');
+      setStatus('Saved on this device. The Teacher online answer record is not connected yet.', 'error');
       return;
     }
 
@@ -159,7 +159,7 @@
         })
       });
       if (response.type !== 'opaque' && !response.ok) throw new Error('Save failed');
-      setStatus('Saved for Tina · ' + answeredCount() + ' of ' + TOTAL + ' answers recorded.', 'success');
+      setStatus('Saved for Teacher · ' + answeredCount() + ' of ' + TOTAL + ' answers recorded.', 'success');
       if (fromButton) saveButton.textContent = 'Saved';
     } catch (error) {
       setStatus('Saved on this device. The online copy could not update, so it will retry when you make another change.', 'error');
@@ -233,6 +233,6 @@
 
   function createId() {
     if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
-    return (testMode ? 'mock-exam-2-tina-test-' : 'mock-exam-2-joy-') + Date.now() + '-' + Math.random().toString(16).slice(2);
+    return (testMode ? 'mock-exam-2-teacher-test-' : 'mock-exam-2-joy-') + Date.now() + '-' + Math.random().toString(16).slice(2);
   }
 }());

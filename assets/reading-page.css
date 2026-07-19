@@ -9,16 +9,23 @@ body.resource-page { padding-top: 66px; }
 .resource-topbar a { color: #252622; font-size: 13px; font-weight: 800; text-decoration: none; }
 .resource-actions { display: flex; align-items: center; gap: 14px; }
 .resource-topbar .resource-context { color: #6d7069; font-size: 12px; font-weight: 700; }
+.resource-reveal-status { padding: 4px 8px; border-radius: 999px; background: #ece8df; color: #5d5f59; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.resource-reveal-status.is-released { background: #e3efe6; color: #31533b; }
 .resource-topbar button { min-height: 36px; padding: 0 13px; color: white; border: 0; border-radius: 7px; background: #b84f31; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; transition: transform .16s ease, background .16s ease; }
 .resource-topbar button:hover { background: #963d25; }
 .resource-topbar button:active { transform: scale(.98); }
 .resource-topbar a:focus-visible, .resource-topbar button:focus-visible { outline: 3px solid #252622; outline-offset: 3px; }
 body.resource-page main { margin-top: 24px; }
+.resource-answer-annotation { margin: 18px 0 2px; border: 1px solid #b9c8bd; border-radius: 8px; background: #f1f8f3; font-family: Arial, Helvetica, sans-serif; }
+.resource-answer-annotation summary { padding: 11px 14px; color: #224a32; font-weight: 800; cursor: pointer; }
+.resource-answer-body { padding: 2px 14px 12px; border-top: 1px solid #cad8cd; }
+.resource-answer-body p { margin: 9px 0; }
 @media (max-width: 720px) {
   body.resource-page { padding-top: 58px; }
   .resource-topbar { min-height: 52px; padding: 9px 14px; }
   .resource-topbar .resource-context { display: none; }
+  .resource-reveal-status { max-width: 132px; overflow: hidden; text-overflow: ellipsis; }
   .resource-actions { gap: 8px; }
   body.resource-page main { margin-top: 0; }
 }
-@media print { .resource-topbar { display: none !important; } body.resource-page { padding-top: 0; } }
+@media print { .resource-topbar,.resource-answer-annotation { display: none !important; } body.resource-page { padding-top: 0; } }
