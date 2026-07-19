@@ -89,11 +89,10 @@ body.portal-ready .choice:has(input:focus-visible) { outline: 3px solid var(--po
 .mistake-method { padding-top: 14px; color: #765317 !important; }
 .mistake-diff { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .mistake-diff-line { display: grid; gap: 7px; align-content: start; min-width: 0; padding: 12px; border-radius: 8px; }
-.mistake-diff-line > span { font-size: 10px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
-.mistake-diff-line del, .mistake-diff-line ins { text-decoration-thickness: 2px; text-decoration-skip-ink: auto; overflow-wrap: anywhere; font-size: 12px; line-height: 1.55; }
+.mistake-diff-heading { font-size: 10px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.mistake-explanation-body .mistake-diff-copy { margin: 0; color: inherit; text-decoration: none; overflow-wrap: anywhere; font-size: 12px; line-height: 1.55; }
 .diff-missed { color: #7f332d; background: #fff0ed; }
 .diff-required { color: #28593b; background: #e8f3eb; }
-.diff-required ins { text-decoration: none; }
 .mistake-takeaway { padding: 11px 12px; border-left: 4px solid var(--portal-accent); background: white; }
 
 .reasoning { margin-top: 15px; border-top: 1px solid #e7e2d8; padding-top: 14px; }

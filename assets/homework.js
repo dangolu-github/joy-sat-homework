@@ -732,8 +732,8 @@
 
     var diff = document.createElement('div');
     diff.className = 'mistake-diff';
-    diff.appendChild(diffLine('Your path', 'Choice ' + (explanation.selectedAnswer || '') + ' — ' + (explanation.whySelectedFails || ''), 'diff-missed', 'del'));
-    diff.appendChild(diffLine('Required path', 'Choice ' + (explanation.correctAnswer || '') + ' — ' + (explanation.correctPath || ''), 'diff-required', 'ins'));
+    diff.appendChild(diffLine('Your path', 'Choice ' + (explanation.selectedAnswer || '') + ' — ' + (explanation.whySelectedFails || ''), 'diff-missed'));
+    diff.appendChild(diffLine('Required path', 'Choice ' + (explanation.correctAnswer || '') + ' — ' + (explanation.correctPath || ''), 'diff-required'));
     body.appendChild(diff);
 
     var takeaway = document.createElement('p');
@@ -757,12 +757,14 @@
     return line;
   }
 
-  function diffLine(label, value, className, tagName) {
+  function diffLine(label, value, className) {
     var line = document.createElement('div');
     line.className = 'mistake-diff-line ' + className;
     var heading = document.createElement('span');
+    heading.className = 'mistake-diff-heading';
     heading.textContent = label;
-    var annotation = document.createElement(tagName);
+    var annotation = document.createElement('p');
+    annotation.className = 'mistake-diff-copy';
     annotation.textContent = value;
     line.appendChild(heading);
     line.appendChild(annotation);
