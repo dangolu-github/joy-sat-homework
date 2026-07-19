@@ -123,6 +123,9 @@ body.portal-ready .choice:has(input:focus-visible) { outline: 3px solid var(--po
 .portal-submit:disabled { cursor: not-allowed; opacity: .55; }
 .portal-unanswered { font-size: 13px; color: #d2d3cf; }
 .portal-unanswered.has-gaps { color: #ffd3c4; }
+body.portal-archived .portal-submit-zone { background: #343733; }
+body.portal-archived .portal-track { opacity: .72; }
+body.portal-archived .choice { cursor: default; }
 
 .result-kicker { display: block; margin-bottom: 8px; color: #f3b5a2; font-size: 11px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
 .result-score { display: flex; align-items: baseline; gap: 14px; margin-bottom: 10px; }

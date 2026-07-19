@@ -19,6 +19,10 @@
   var progressPollTimer = null;
   var resultPollTimer = null;
   var submitted = teacherReviewMode || Boolean(state.submittedAt);
+  var archiveMode = false;
+  var assignmentStateReady = teacherReviewMode || testMode || !config.submissionEndpoint;
+  var normalStartupDone = false;
+  var assignmentStateTimer = null;
 
   if (submittedReviewMode) state.submissionId = reviewSubmissionId;
   if (progressReviewMode) state.submissionId = progressSaveId;
@@ -33,14 +37,94 @@
   document.body.classList.add('portal-ready');
   if (submittedReviewMode) pollForResult(0);
   else if (progressReviewMode) pollForProgressReview(0);
+  else if (assignmentStateReady) startNormalPage();
   else {
-    checkResetState();
-    if (submitted) pollForResult(0);
-    else if (!submitted && hasProgress()) scheduleProgressSync(true);
+    setAssignmentCheckingState();
+    loadAssignmentState(true);
+    assignmentStateTimer = setInterval(function () { loadAssignmentState(false); }, 15000);
   }
   window.addEventListener('online', function () {
-    if (!teacherReviewMode && !submitted && hasProgress()) scheduleProgressSync(true);
+    if (!teacherReviewMode && !submitted && !archiveMode && hasProgress()) scheduleProgressSync(true);
   });
+
+  function setAssignmentCheckingState() {
+    var button = document.getElementById('portal-submit');
+    button.disabled = true;
+    button.textContent = 'Checking assignment status…';
+  }
+
+  function startNormalPage() {
+    if (normalStartupDone) return;
+    normalStartupDone = true;
+    assignmentStateReady = true;
+    if (!submitted) {
+      var button = document.getElementById('portal-submit');
+      button.disabled = false;
+      button.textContent = 'Submit homework';
+    }
+    checkResetState();
+    if (submitted) pollForResult(0);
+    else if (hasProgress()) scheduleProgressSync(true);
+  }
+
+  function loadAssignmentState(initial) {
+    if (teacherReviewMode || testMode || !config.submissionEndpoint) return;
+    jsonp('getAssignmentState', {
+      assignmentId: assignmentId,
+      environment: state.environment || 'production',
+      saveId: state.submissionId || ''
+    }, function (data) {
+      if (!data || !data.ok) {
+        if (initial) startNormalPage();
+        return;
+      }
+      if (data.submissionBlocked) {
+        if (data.latestSubmissionId) restoreArchivedSubmission(data);
+        else lockArchivedPage();
+        return;
+      }
+      if (archiveMode) {
+        window.location.reload();
+        return;
+      }
+      if (initial) startNormalPage();
+    }, function () {
+      if (initial) startNormalPage();
+    });
+  }
+
+  function restoreArchivedSubmission(data) {
+    if (submittedReviewMode && state.submissionId === data.latestSubmissionId && archiveMode) return;
+    archiveMode = true;
+    submittedReviewMode = true;
+    progressReviewMode = false;
+    teacherReviewMode = true;
+    submitted = true;
+    state.submissionId = data.latestSubmissionId;
+    state.submittedAt = data.latestSubmittedAt || state.submittedAt;
+    state.result = null;
+    try { localStorage.setItem(storageKey, JSON.stringify(state)); } catch (error) {}
+    document.body.classList.add('portal-archived');
+    document.getElementById('portal-save').textContent = 'Archived · completed submission preserved';
+    lockSubmittedPage();
+    pollForResult(0);
+  }
+
+  function lockArchivedPage() {
+    archiveMode = true;
+    assignmentStateReady = true;
+    document.body.classList.add('portal-archived');
+    questions.forEach(function (question) {
+      Array.from(question.querySelectorAll('input, textarea')).forEach(function (field) { field.disabled = true; });
+    });
+    var copy = document.getElementById('portal-submit-copy');
+    copy.innerHTML = '<h2>Homework archived</h2><p>This assignment is closed. Existing submitted work is preserved, but new answers and submissions are disabled.</p>';
+    var button = document.getElementById('portal-submit');
+    button.disabled = true;
+    button.textContent = 'Homework archived — submissions closed';
+    document.getElementById('portal-save').textContent = 'Read-only · archived';
+    document.getElementById('difficulty-panel').hidden = true;
+  }
 
   function freshState() {
     return {
@@ -115,7 +199,7 @@
           captureQuestion(questionNumber);
         });
         choice.addEventListener('click', function (event) {
-          if (submitted || event.target.tagName === 'INPUT') return;
+          if (submitted || archiveMode || event.target.tagName === 'INPUT') return;
           input.checked = true;
           input.dispatchEvent(new Event('change', { bubbles: true }));
         });
@@ -173,7 +257,7 @@
   }
 
   function captureQuestion(number) {
-    if (submitted) return;
+    if (submitted || archiveMode) return;
     var question = questions[number - 1];
     var selected = question.querySelector('input[type="radio"]:checked');
     var response = state.responses[number] || {};
@@ -202,14 +286,14 @@
   }
 
   function scheduleSave() {
-    if (teacherReviewMode) return;
+    if (teacherReviewMode || archiveMode) return;
     clearTimeout(saveTimer);
     document.getElementById('portal-save').textContent = 'Saving…';
     saveTimer = setTimeout(saveState, 180);
   }
 
   function saveState() {
-    if (teacherReviewMode) return;
+    if (teacherReviewMode || archiveMode) return;
     state.updatedAt = new Date().toISOString();
     try {
       localStorage.setItem(storageKey, JSON.stringify(state));
@@ -228,13 +312,13 @@
   }
 
   function scheduleProgressSync(immediate) {
-    if (teacherReviewMode || submitted || !config.submissionEndpoint || !hasProgress()) return;
+    if (teacherReviewMode || submitted || archiveMode || !config.submissionEndpoint || !hasProgress()) return;
     clearTimeout(progressSyncTimer);
     progressSyncTimer = setTimeout(saveProgressRemote, immediate ? 80 : 900);
   }
 
   async function saveProgressRemote() {
-    if (teacherReviewMode || submitted || !config.submissionEndpoint || !hasProgress()) return;
+    if (teacherReviewMode || submitted || archiveMode || !config.submissionEndpoint || !hasProgress()) return;
     var clientUpdatedAt = state.updatedAt || new Date().toISOString();
     try {
       var response = await fetch(config.submissionEndpoint, {
@@ -260,6 +344,7 @@
   }
 
   function verifyProgressSync(clientUpdatedAt, attempt) {
+    if (archiveMode) return;
     jsonp('getHomeworkProgress', { saveId: state.submissionId, assignmentId: assignmentId }, function (data) {
       if (data && data.ok && !data.pending && data.clientUpdatedAt === clientUpdatedAt) {
         document.getElementById('portal-save').textContent = 'Saved on this device and with Teacher';
@@ -290,8 +375,37 @@
     gapLabel.classList.toggle('has-gaps', missing > 0);
   }
 
-  async function submitHomework() {
-    if (submitted || teacherReviewMode) return;
+  function submitHomework() {
+    if (submitted || teacherReviewMode || archiveMode || !assignmentStateReady) return;
+    if (testMode || !config.submissionEndpoint) {
+      submitHomeworkNow();
+      return;
+    }
+    var button = document.getElementById('portal-submit');
+    button.disabled = true;
+    button.textContent = 'Checking assignment status…';
+    jsonp('getAssignmentState', {
+      assignmentId: assignmentId,
+      environment: 'production',
+      saveId: state.submissionId || ''
+    }, function (data) {
+      if (data && data.submissionBlocked) {
+        if (data.latestSubmissionId) restoreArchivedSubmission(data);
+        else lockArchivedPage();
+        return;
+      }
+      button.disabled = false;
+      button.textContent = 'Submit homework';
+      submitHomeworkNow();
+    }, function () {
+      button.disabled = false;
+      button.textContent = 'Try again';
+      showMessage('The assignment status could not be verified. Please try again before submitting.');
+    });
+  }
+
+  async function submitHomeworkNow() {
+    if (submitted || teacherReviewMode || archiveMode) return;
     questions.forEach(function (_, index) { captureQuestion(index + 1); });
     saveState();
     var missing = questions.map(function (_, index) { return index + 1; }).filter(function (number) {
@@ -330,19 +444,18 @@
     var button = document.getElementById('portal-submit');
     button.disabled = true;
     button.textContent = 'Sending homework…';
-    state.submittedAt = new Date().toISOString();
+    var submittedAt = new Date().toISOString();
     state.environment = testMode ? 'test' : 'production';
     try {
       var response = await fetch(config.submissionEndpoint, {
-        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(state)
+        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({}, state, { submittedAt: submittedAt }))
       });
       if (response.type !== 'opaque' && !response.ok) throw new Error('Submission failed');
       submitted = true;
-      saveState();
       lockSubmittedPage();
       pollForResult(0);
     } catch (error) {
-      state.submittedAt = null;
+      submitted = false;
       button.disabled = false;
       button.textContent = 'Try sending again';
       saveState();
@@ -366,21 +479,56 @@
     if (!config.submissionEndpoint || !state.submissionId) return;
     jsonp('getGradedResult', { submissionId: state.submissionId, assignmentId: assignmentId }, function (data) {
       if (data && data.ok && !data.pending) {
+        submitted = true;
+        state.submittedAt = data.submittedAt || state.submittedAt || new Date().toISOString();
         state.result = data;
         saveState();
+        lockSubmittedPage();
         renderResult(data);
         if (!data.checkMode) resultPollTimer = setTimeout(function () { pollForResult(0); }, 10000);
         return;
       }
       if (attempt < 12) setTimeout(function () { pollForResult(attempt + 1); }, Math.min(900 + attempt * 350, 3200));
       else {
-        document.getElementById('portal-submit').textContent = submittedReviewMode ? 'Submitted review unavailable' : 'Submitted — refresh to check release status';
-        showMessage(submittedReviewMode ? 'This submitted review could not be loaded.' : 'Your homework is safely submitted. Refresh this page in a moment to check its release status.');
+        if (submittedReviewMode) {
+          document.getElementById('portal-submit').textContent = 'Submitted review unavailable';
+          showMessage('This submitted review could not be loaded.');
+        } else handleUnconfirmedSubmission();
       }
     }, function () {
       if (attempt < 12) setTimeout(function () { pollForResult(attempt + 1); }, 1800);
-      else showMessage(submittedReviewMode ? 'This submitted review could not be loaded.' : 'Your homework is submitted. Refresh shortly to check its release status.');
+      else if (submittedReviewMode) showMessage('This submitted review could not be loaded.');
+      else handleUnconfirmedSubmission();
     });
+  }
+
+  function handleUnconfirmedSubmission() {
+    jsonp('getAssignmentState', {
+      assignmentId: assignmentId,
+      environment: state.environment || 'production',
+      saveId: state.submissionId || ''
+    }, function (data) {
+      if (data && data.submissionBlocked) {
+        if (data.latestSubmissionId) restoreArchivedSubmission(data);
+        else lockArchivedPage();
+        return;
+      }
+      unlockAfterUnconfirmedSubmission();
+    }, unlockAfterUnconfirmedSubmission);
+  }
+
+  function unlockAfterUnconfirmedSubmission() {
+    submitted = false;
+    state.submittedAt = null;
+    document.body.classList.remove('portal-submitted');
+    questions.forEach(function (question) {
+      Array.from(question.querySelectorAll('input, textarea')).forEach(function (field) { field.disabled = false; });
+    });
+    var button = document.getElementById('portal-submit');
+    button.disabled = false;
+    button.textContent = 'Try sending again';
+    saveState();
+    showMessage('No submitted result was confirmed. Your work is still saved; try again or ask the Teacher to check whether this homework is archived.');
   }
 
   function pollForProgressReview(attempt) {
@@ -656,7 +804,7 @@
   }
 
   async function saveDifficultyFlags() {
-    if (teacherReviewMode || !config.submissionEndpoint) return;
+    if (teacherReviewMode || archiveMode || !config.submissionEndpoint) return;
     try {
       await fetch(config.submissionEndpoint, {
         method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
