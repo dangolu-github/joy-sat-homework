@@ -2,6 +2,7 @@
   'use strict';
 
   var config = window.JOY_HOMEWORK_CONFIG || {};
+  function portalAccessToken() { return window.JoyPortalAccess ? window.JoyPortalAccess.getToken() : ''; }
   var TOTAL = 66;
   var testMode = new URLSearchParams(window.location.search).get('test') === '1';
   var STORAGE_KEY = testMode ? 'joy-mock-exam-2-answers-teacher-test' : 'joy-mock-exam-2-answers-joy';
@@ -149,6 +150,7 @@
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
           action: 'saveMockAnswers',
+          accessToken: portalAccessToken(),
           saveId: state.saveId,
           studentName: state.studentName,
           environment: state.environment,
@@ -217,6 +219,7 @@
   }
 
   function jsonp(action, parameters, success, failure) {
+    parameters.accessToken = portalAccessToken();
     var callbackName = '__joyMockPortal' + Date.now() + Math.random().toString(16).slice(2);
     var script = document.createElement('script');
     var timeout = setTimeout(function () { cleanup(); if (failure) failure(new Error('Timed out')); }, 9000);

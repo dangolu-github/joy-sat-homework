@@ -2,6 +2,7 @@
   'use strict';
 
   var config = window.JOY_HOMEWORK_CONFIG || {};
+  function portalAccessToken() { return window.JoyPortalAccess ? window.JoyPortalAccess.getToken() : ''; }
   var assignmentId = config.assignmentId || 'joy-homework';
   var query = new URLSearchParams(window.location.search);
   var testMode = query.get('test') === '1';
@@ -327,6 +328,7 @@
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
           action: 'saveHomeworkProgress',
+          accessToken: portalAccessToken(),
           assignmentId: assignmentId,
           assignmentLabel: state.assignmentLabel,
           submissionId: state.submissionId,
@@ -448,7 +450,7 @@
     state.environment = testMode ? 'test' : 'production';
     try {
       var response = await fetch(config.submissionEndpoint, {
-        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({}, state, { submittedAt: submittedAt }))
+        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({}, state, { accessToken: portalAccessToken(), submittedAt: submittedAt }))
       });
       if (response.type !== 'opaque' && !response.ok) throw new Error('Submission failed');
       submitted = true;
@@ -808,7 +810,7 @@
     try {
       await fetch(config.submissionEndpoint, {
         method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'saveDifficultyFlags', assignmentId: assignmentId, submissionId: state.submissionId, studentName: state.studentName, environment: state.environment, flags: state.difficultyFlags || {} })
+        body: JSON.stringify({ action: 'saveDifficultyFlags', accessToken: portalAccessToken(), assignmentId: assignmentId, submissionId: state.submissionId, studentName: state.studentName, environment: state.environment, flags: state.difficultyFlags || {} })
       });
       document.getElementById('difficulty-status').textContent = 'Review list saved for Teacher.';
     } catch (error) {
@@ -839,6 +841,7 @@
   }
 
   function jsonp(action, parameters, success, failure) {
+    parameters.accessToken = portalAccessToken();
     var callbackName = '__joyPortal' + Date.now() + Math.random().toString(16).slice(2);
     var script = document.createElement('script');
     var timeout = setTimeout(function () { cleanup(); if (failure) failure(new Error('Timed out')); }, 9000);

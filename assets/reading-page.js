@@ -1,5 +1,6 @@
 (function () {
   'use strict';
+  function portalAccessToken() { return window.JoyPortalAccess ? window.JoyPortalAccess.getToken() : ''; }
   document.body.classList.add('resource-page');
   var backHref = document.body.dataset.resourceBack || './';
   var backLabel = document.body.dataset.resourceBackLabel || '← July 15 class page';
@@ -66,6 +67,7 @@
   }
 
   function jsonp(action, parameters, success) {
+    parameters.accessToken = portalAccessToken();
     var callbackName = '__joyResource' + Date.now() + Math.random().toString(16).slice(2);
     var script = document.createElement('script');
     var timeout = window.setTimeout(cleanup, 9000);

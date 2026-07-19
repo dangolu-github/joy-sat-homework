@@ -2,6 +2,7 @@
   'use strict';
 
   var config = window.JOY_HOMEWORK_CONFIG || {};
+  function portalAccessToken() { return window.JoyPortalAccess ? window.JoyPortalAccess.getToken() : ''; }
   var form = document.getElementById('pdf-upload-form');
   var input = document.getElementById('pdf-files');
   var picker = document.getElementById('file-picker');
@@ -72,6 +73,7 @@
 
       var payload = {
         action: 'uploadPdf',
+        accessToken: portalAccessToken(),
         uploadId: createId(),
         studentName: 'Joy',
         classDate: '2026-07-15',
