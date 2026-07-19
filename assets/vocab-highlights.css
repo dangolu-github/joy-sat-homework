@@ -1,0 +1,24 @@
+.joy-vocab {
+  display: inline;
+  padding: 0.02em 0.14em;
+  border-radius: 0.18em;
+  color: inherit !important;
+  font-weight: inherit !important;
+  text-decoration: none !important;
+  background-color: #a9d6ff !important;
+  background-image: linear-gradient(#a9d6ff, #a9d6ff) !important;
+  box-shadow: none !important;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+@media (forced-colors: active) {
+  .joy-vocab {
+    color: HighlightText !important;
+    background: Highlight !important;
+    outline: 1px solid currentColor;
+  }
+}
+
