@@ -143,6 +143,16 @@ body.portal-archived .choice { cursor: default; }
 .difficulty-choice input { accent-color: var(--portal-accent); }
 .difficulty-status { margin-top: 14px; color: var(--portal-green); font-size: 12px; font-weight: 750; }
 
+.teacher-answer-summary { max-width: 980px; margin: -52px auto 80px; padding: 30px; border: 1px solid #cad8ce; border-radius: 18px; background: #f1f7f2; }
+.teacher-answer-summary .result-kicker { color: var(--portal-green); }
+.teacher-answer-summary h2 { margin: 0 0 7px; font-size: clamp(22px, 4vw, 32px); }
+.teacher-answer-summary p { margin: 0; color: var(--portal-muted); }
+.teacher-answer-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 9px; margin-top: 22px; }
+.teacher-answer-item { display: grid; gap: 3px; place-items: center; min-width: 0; padding: 10px 6px; border: 1px solid #cad8ce; border-radius: 9px; background: white; }
+.teacher-answer-item span { color: var(--portal-muted); font-size: 11px; font-weight: 750; }
+.teacher-answer-item strong { color: var(--portal-green); font-size: 20px; line-height: 1; }
+.teacher-answer-warning { margin-top: 12px !important; color: #8f2d25 !important; font-weight: 750; }
+
 .portal-message { position: fixed; z-index: 130; right: 22px; bottom: 22px; max-width: 390px; padding: 16px 18px; border-radius: 10px; color: white; background: var(--portal-ink); box-shadow: 0 18px 50px rgba(0, 0, 0, .2); }
 .portal-message[hidden] { display: none; }
 
@@ -159,6 +169,8 @@ body.portal-archived .choice { cursor: default; }
   .reasoning-field:last-child { grid-column: auto; }
   .portal-submit-zone { margin: 18px 12px 42px; padding: 24px 20px; }
   .difficulty-panel { margin: -20px 12px 42px; padding: 24px 20px; }
+  .teacher-answer-summary { margin: -20px 12px 42px; padding: 24px 20px; }
+  .teacher-answer-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .difficulty-grid { grid-template-columns: repeat(2, 1fr); }
   .portal-submit-row { align-items: stretch; flex-direction: column; }
   .portal-submit { width: 100%; }
@@ -172,4 +184,5 @@ body.portal-archived .choice { cursor: default; }
   .portal-bar, .portal-submit-zone, .portal-message, .difficulty-panel { display: none !important; }
   body.portal-ready { padding-top: 0; }
   .mistake-explanation { break-inside: avoid; }
+  .teacher-answer-summary { break-inside: avoid; margin: 24px auto 0; }
 }

@@ -6,6 +6,8 @@
   var assignmentId = config.assignmentId || 'joy-homework';
   var query = new URLSearchParams(window.location.search);
   var testMode = query.get('test') === '1';
+  var teacherAnswerToken = cleanReference(query.get('teacherAnswerToken'));
+  var teacherAnswerMode = testMode && Boolean(teacherAnswerToken);
   var reviewSubmissionId = cleanReference(query.get('reviewSubmissionId'));
   var progressSaveId = cleanReference(query.get('progressSaveId'));
   var submittedReviewMode = Boolean(reviewSubmissionId);
@@ -33,6 +35,7 @@
   installHeader();
   enhanceQuestions();
   installSubmitZone();
+  installTeacherAnswerSummary();
   restoreState();
   updateProgress();
   document.body.classList.add('portal-ready');
@@ -168,7 +171,7 @@
     header.innerHTML =
       '<a class="portal-brand" href="' + escapeHtml(config.returnUrl || '../') + '">Joy SAT</a>' +
       '<div class="portal-progress" aria-label="Homework progress">' +
-        '<div class="portal-progress-row"><span>' + escapeHtml(testMode ? 'Teacher test copy' : (config.progressLabel || 'Homework progress')) + '</span><strong id="portal-count">0 of ' + questions.length + ' answered</strong></div>' +
+        '<div class="portal-progress-row"><span>' + escapeHtml(testMode ? 'Teacher copy' : (config.progressLabel || 'Homework progress')) + '</span><strong id="portal-count">0 of ' + questions.length + ' answered</strong></div>' +
         '<div class="portal-track"><div class="portal-fill" id="portal-fill"></div></div>' +
       '</div>' +
       '<div class="portal-actions">' +
@@ -255,6 +258,42 @@
     message.hidden = true;
     document.body.appendChild(message);
     document.getElementById('portal-submit').addEventListener('click', submitHomework);
+  }
+
+  function installTeacherAnswerSummary() {
+    if (!teacherAnswerMode || !config.submissionEndpoint) return;
+    var panel = document.createElement('section');
+    panel.className = 'teacher-answer-summary';
+    panel.id = 'teacher-answer-summary';
+    panel.innerHTML = '<span class="result-kicker">Private Teacher copy</span><h2>Answer summary</h2><p>Loading the private answer key…</p>';
+    document.body.appendChild(panel);
+    jsonp('getTeacherAnswerSummary', {
+      assignmentId: assignmentId,
+      teacherAnswerToken: teacherAnswerToken
+    }, function (data) {
+      if (!data || !data.ok || !Array.isArray(data.answers)) {
+        renderTeacherAnswerError('The private answer key could not be loaded. Reopen this page from the Teacher Dashboard.');
+        return;
+      }
+      var countWarning = data.answers.length === questions.length ? '' :
+        '<p class="teacher-answer-warning">Answer count does not match this page. Refresh the Teacher Dashboard before using this key.</p>';
+      panel.innerHTML =
+        '<span class="result-kicker">Private Teacher copy</span>' +
+        '<h2>Answer summary</h2>' +
+        '<p>' + escapeHtml(data.assignmentLabel || config.assignmentLabel || document.title) + ' · ' + data.answers.length + ' questions</p>' +
+        countWarning +
+        '<div class="teacher-answer-grid" aria-label="Answer summary">' +
+          data.answers.map(function (answer, index) {
+            return '<div class="teacher-answer-item"><span>Q' + (index + 1) + '</span><strong>' + escapeHtml(answer) + '</strong></div>';
+          }).join('') +
+        '</div>';
+    }, function () {
+      renderTeacherAnswerError('This Teacher answer link is unavailable or has expired. Reopen it from the Teacher Dashboard.');
+    });
+
+    function renderTeacherAnswerError(message) {
+      panel.innerHTML = '<span class="result-kicker">Private Teacher copy</span><h2>Answer summary unavailable</h2><p>' + escapeHtml(message) + '</p>';
+    }
   }
 
   function captureQuestion(number) {
