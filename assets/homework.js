@@ -109,7 +109,7 @@
     state.result = null;
     try { localStorage.setItem(storageKey, JSON.stringify(state)); } catch (error) {}
     document.body.classList.add('portal-archived');
-    document.getElementById('portal-save').textContent = 'Archived · completed submission preserved';
+    document.getElementById('portal-save').textContent = 'Receiving stopped · completed submission preserved';
     lockSubmittedPage();
     pollForResult(0);
   }
@@ -122,11 +122,11 @@
       Array.from(question.querySelectorAll('input, textarea')).forEach(function (field) { field.disabled = true; });
     });
     var copy = document.getElementById('portal-submit-copy');
-    copy.innerHTML = '<h2>Homework archived</h2><p>This assignment is closed. Existing submitted work is preserved, but new answers and submissions are disabled.</p>';
+    copy.innerHTML = '<h2>Receiving stopped</h2><p>The Teacher is no longer receiving new work for this page. Existing submitted work is preserved, but new answers and submissions are disabled.</p>';
     var button = document.getElementById('portal-submit');
     button.disabled = true;
-    button.textContent = 'Homework archived — submissions closed';
-    document.getElementById('portal-save').textContent = 'Read-only · archived';
+    button.textContent = 'Receiving stopped — page is read-only';
+    document.getElementById('portal-save').textContent = 'Read-only · receiving stopped';
     document.getElementById('difficulty-panel').hidden = true;
   }
 
@@ -569,7 +569,7 @@
     button.disabled = false;
     button.textContent = 'Try sending again';
     saveState();
-    showMessage('No submitted result was confirmed. Your work is still saved; try again or ask the Teacher to check whether this homework is archived.');
+    showMessage('No submitted result was confirmed. Your work is still saved; try again or ask the Teacher whether receiving has been stopped for this homework.');
   }
 
   function pollForProgressReview(attempt) {
