@@ -3,7 +3,11 @@
 
   var ENDPOINT = 'https://script.google.com/macros/s/AKfycbwz64jQW8YH6CEgH-GK4ieTyiJD40h5ro3udAQEr96j7dtqh9dgphwO-FmZyiSCXnUi/exec';
   var STORAGE_KEY = 'joy-portal-access-v1';
+  var PRESENCE_DEVICE_KEY = 'joy-live-presence-device-v1';
+  var TEACHER_PROFILE_KEY = 'joy-teacher-profile-v1';
+  var HEARTBEAT_INTERVAL_MS = 30000;
   var memoryToken = '';
+  var presenceTimer = null;
   var resolveReady;
   var ready = new Promise(function (resolve) { resolveReady = resolve; });
 
@@ -97,6 +101,74 @@
     document.documentElement.classList.add('portal-access-granted');
     resolveReady(token);
     document.dispatchEvent(new CustomEvent('joyportalaccess', { detail: { granted: true } }));
+    startPresence(token);
+  }
+
+  function startPresence(token) {
+    var parameters = new URLSearchParams(window.location.search);
+    if (parameters.get('teacherPresence') === '1' || parameters.has('teacherAnswerToken')) {
+      markTeacherProfile(token);
+      return;
+    }
+    if (isTeacherProfile()) return;
+    var deviceId = presenceDeviceId();
+    if (!deviceId) return;
+    stopPresence();
+    heartbeatWhenVisible();
+    presenceTimer = window.setInterval(heartbeatWhenVisible, HEARTBEAT_INTERVAL_MS);
+    document.addEventListener('visibilitychange', heartbeatWhenVisible);
+
+    function heartbeatWhenVisible() {
+      if (document.visibilityState === 'hidden') return;
+      sendPresence('presenceHeartbeat', { deviceId: deviceId }, token);
+    }
+  }
+
+  function markTeacherProfile(token) {
+    var deviceId = '';
+    stopPresence();
+    try {
+      localStorage.setItem(TEACHER_PROFILE_KEY, 'teacher');
+      deviceId = localStorage.getItem(PRESENCE_DEVICE_KEY) || '';
+      localStorage.removeItem(PRESENCE_DEVICE_KEY);
+    } catch (error) {}
+    if (deviceId) sendPresence('clearOwnPresence', { deviceId: deviceId }, token);
+  }
+
+  function stopPresence() {
+    if (presenceTimer) window.clearInterval(presenceTimer);
+    presenceTimer = null;
+  }
+
+  function isTeacherProfile() {
+    try { return localStorage.getItem(TEACHER_PROFILE_KEY) === 'teacher'; } catch (error) { return false; }
+  }
+
+  function presenceDeviceId() {
+    try {
+      var existing = localStorage.getItem(PRESENCE_DEVICE_KEY) || '';
+      if (existing) return existing;
+      var created = window.crypto && window.crypto.randomUUID
+        ? window.crypto.randomUUID().replace(/-/g, '')
+        : Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+      localStorage.setItem(PRESENCE_DEVICE_KEY, created);
+      return created;
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function sendPresence(action, parameters, token) {
+    var payload = Object.assign({ action: action, accessToken: token }, parameters);
+    try {
+      window.fetch(ENDPOINT, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).catch(function () {});
+    } catch (error) {}
   }
 
   function showRetry() {
