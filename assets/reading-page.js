@@ -19,7 +19,9 @@
   nav.querySelector('a').textContent = backLabel;
   nav.querySelector('.resource-context').textContent = contextLabel;
   document.body.insertBefore(nav, document.body.firstChild);
-  document.getElementById('save-resource-pdf').addEventListener('click', function () {
+  var saveButton = document.getElementById('save-resource-pdf');
+  if (resourceShell) saveButton.hidden = true;
+  saveButton.addEventListener('click', function () {
     window.print();
   });
   if (resourceId && endpoint) {
