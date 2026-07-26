@@ -1,12 +1,16 @@
 (function () {
   'use strict';
-  function portalAccessToken() { return window.JoyPortalAccess ? window.JoyPortalAccess.getToken() : ''; }
+  function portalAccessToken() {
+    return document.body.dataset.resourceAccessToken ||
+      (window.JoyPortalAccess ? window.JoyPortalAccess.getToken() : '');
+  }
   document.body.classList.add('resource-page');
   var backHref = document.body.dataset.resourceBack || './';
   var backLabel = document.body.dataset.resourceBackLabel || '← July 15 class page';
   var contextLabel = document.body.dataset.resourceContext || 'Joy SAT · Class 12';
   var resourceId = document.body.dataset.resourceId || '';
   var endpoint = document.body.dataset.resourceEndpoint || '';
+  var resourceShell = document.body.dataset.resourceShell === 'true';
   var nav = document.createElement('nav');
   nav.className = 'resource-topbar';
   nav.setAttribute('aria-label', 'Resource navigation');
@@ -26,8 +30,28 @@
   function loadLearningResource() {
     jsonp('getLearningResource', { resourceId: resourceId }, function (data) {
       if (!data || !data.ok) return;
+      if (resourceShell && data.accessMode && data.contentUrl) {
+        window.location.replace(data.contentUrl + '&accessToken=' + encodeURIComponent(portalAccessToken()));
+        return;
+      }
+      if (resourceShell && !data.accessMode) {
+        renderAccessLocked();
+        return;
+      }
       renderReveal(Boolean(data.revealMode), data.annotations || []);
     });
+  }
+
+  function renderAccessLocked() {
+    var status = document.getElementById('resource-reveal-status');
+    status.hidden = false;
+    status.textContent = 'Handout not released';
+    status.classList.remove('is-released');
+    var message = document.getElementById('resource-access-message');
+    if (message) {
+      message.hidden = false;
+      message.textContent = 'This handout is being prepared for a future class. Your teacher will release it when it is ready.';
+    }
   }
 
   function renderReveal(enabled, annotations) {
