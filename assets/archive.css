@@ -26,5 +26,26 @@
 .historical-card h2{margin:0 0 12px;font-size:19px}.answer-line{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 .answer-chip{border-radius:999px;padding:5px 10px;background:#eef2f8;font-weight:700}.answer-chip.correct{background:#e3f5e8;color:#135c37}.answer-chip.selected{background:#fff0d9;color:#7a4300}
 .historical-card dt{font-weight:800;margin-top:10px}.historical-card dd{margin:3px 0 0}.historical-notice{color:#5d6678}
+.historical-checked-panel{margin:22px 0 30px;border:2px solid #8fa6cf;border-radius:14px;background:#f7f9fd;padding:18px 20px}
+.historical-checked-header{margin:0 0 14px;border:0!important;padding:0!important;background:transparent!important}
+.historical-checked-header h2{margin:3px 0 7px!important;border:0!important;padding:0!important;color:var(--archive-ink)!important}
+.historical-checked-header p{margin:5px 0}
+.historical-checked-panel .historical-summary{margin:10px 0 0}
+.historical-reviewed-question{position:relative}
+.historical-reviewed-question .historical-selected-answer{border-width:2px!important}
+.historical-reviewed-question .historical-wrong-answer{border-color:#b83232!important;background:#fff0f0!important;color:#6f1515!important}
+.historical-reviewed-question .historical-correct-answer{border-color:#23824f!important;background:#e8f7ee!important;color:#124b30!important}
+.historical-answer-label{display:block;width:max-content;max-width:100%;margin:7px 0 0;padding:4px 8px;border-radius:999px;background:#e9eef8;color:#26466f;font:700 12px/1.25 Arial,sans-serif}
+.historical-wrong-answer .historical-answer-label{background:#ffdada;color:#7b1818}
+.historical-correct-answer .historical-answer-label{background:#cdebd8;color:#125333}
+.historical-blank-answer{margin:12px 0;padding:9px 12px;border:1px solid #c56565;border-radius:8px;background:#fff0f0;color:#7b1818;font-weight:700}
+.historical-question-wrong{box-shadow:0 0 0 2px rgba(184,50,50,.2)}
+.historical-question-correct{box-shadow:0 0 0 2px rgba(35,130,79,.14)}
+.historical-mistake-explanation{margin:16px 0 2px;border:1px solid #d6a7a7;border-radius:10px;background:#fff}
+.historical-mistake-explanation summary{cursor:pointer;padding:11px 13px;background:#fff1f1;color:#741c1c;font-weight:800}
+.historical-explanation-body{padding:13px 15px}.historical-explanation-body dl{margin:8px 0 0}
+.historical-explanation-body dt{margin-top:10px;font-weight:800}.historical-explanation-body dd{margin:3px 0 0}
+.historical-method{display:inline-block;margin:0!important;padding:5px 9px;border-radius:999px;background:#eaf0fb;color:#244a92;font-weight:800}
+.historical-written-grid{margin-top:16px}
 @media(max-width:760px){.historical-grid{grid-template-columns:1fr}.review-card{padding:18px}.archive-tree{max-height:none}}
-@media print{.workspace-sidebar,.back-link,.checked-tools,.print-review{display:none!important}.workspace-main{padding:0!important}.review-card,.checked-header,.historical-summary,.historical-card{border:0;box-shadow:none}.historical-grid{display:block}.historical-card{break-inside:avoid}}
+@media print{.workspace-sidebar,.back-link,.checked-tools,.print-review{display:none!important}.workspace-main{padding:0!important}.review-card,.checked-header,.historical-summary,.historical-card{border:0;box-shadow:none}.historical-grid{display:block}.historical-card,.historical-mistake-explanation{break-inside:avoid}.historical-checked-panel{border:0;padding:0}}
