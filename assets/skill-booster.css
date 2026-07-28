@@ -1,0 +1,244 @@
+.domain-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding-top: 42px;
+}
+
+.domain-card {
+  display: flex;
+  min-height: 310px;
+  flex-direction: column;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  text-decoration: none;
+  transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+
+.domain-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  box-shadow: 0 18px 36px rgba(55, 50, 40, .08);
+}
+
+.domain-card:focus-visible,
+.booster-open-pdf:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.domain-number,
+.domain-count {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.domain-card h2 {
+  max-width: 14ch;
+  margin: 24px 0 0;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1;
+  letter-spacing: -.05em;
+}
+
+.domain-card p {
+  max-width: 46ch;
+  margin: 18px 0;
+  color: var(--muted);
+}
+
+.domain-card .domain-count {
+  margin-top: auto;
+  color: var(--green);
+}
+
+.domain-card .arrow {
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.skill-section {
+  padding-top: 58px;
+}
+
+.skill-set-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.booster-practice-page {
+  width: min(1480px, calc(100% - 32px));
+}
+
+.booster-practice-hero {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.booster-practice-layout {
+  display: grid;
+  grid-template-columns: minmax(520px, 1.12fr) minmax(420px, .88fr);
+  gap: 22px;
+  align-items: start;
+  margin-top: 32px;
+}
+
+.booster-booklet,
+.booster-answer-sheet {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.booster-booklet {
+  position: sticky;
+  top: 98px;
+  overflow: hidden;
+}
+
+.booster-booklet-heading,
+.booster-answer-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.booster-booklet-heading h2,
+.booster-answer-heading h2 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: -.03em;
+}
+
+.booster-booklet-heading .eyebrow,
+.booster-answer-heading .eyebrow {
+  margin-bottom: 4px;
+}
+
+.booster-open-pdf {
+  flex: 0 0 auto;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: white;
+  background: var(--ink);
+  font-size: 12px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.booster-booklet iframe {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 205px);
+  min-height: 620px;
+  border: 0;
+  background: white;
+}
+
+.booster-answer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px;
+}
+
+body.portal-ready .booster-answer-card {
+  margin: 0;
+  padding: 16px !important;
+  border-radius: 11px !important;
+}
+
+.booster-answer-card .qhead {
+  margin-bottom: 8px;
+}
+
+.booster-answer-card .qhead h2 {
+  font-size: 15px;
+}
+
+.answer-prompt {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+body.portal-ready .booster-answer-card .choices {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  margin-top: 0;
+}
+
+body.portal-ready .booster-answer-card .choice {
+  min-height: 42px;
+  justify-content: center;
+  padding: 8px !important;
+}
+
+body.portal-ready .booster-answer-card .choice-body {
+  justify-self: center;
+}
+
+@media (max-width: 1040px) {
+  .booster-practice-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .booster-booklet {
+    position: static;
+  }
+
+  .booster-booklet iframe {
+    height: 72vh;
+    min-height: 520px;
+  }
+}
+
+@media (max-width: 760px) {
+  .domain-grid,
+  .skill-set-grid,
+  .booster-answer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .domain-card {
+    min-height: 250px;
+  }
+
+  .booster-practice-page {
+    width: min(100% - 20px, 1080px);
+  }
+
+  .booster-booklet-heading,
+  .booster-answer-heading {
+    display: grid;
+  }
+
+  .booster-open-pdf {
+    width: fit-content;
+  }
+}
+
+@media print {
+  .booster-booklet {
+    display: none;
+  }
+
+  .booster-practice-layout,
+  .booster-answer-grid {
+    display: block;
+  }
+
+  .booster-answer-card {
+    break-inside: avoid;
+    margin-bottom: 8px !important;
+  }
+}
