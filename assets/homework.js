@@ -592,7 +592,7 @@
   }
 
   function renderProgressReview(data) {
-    if (data.status === 'submitted') {
+    if (data.status === 'submitted' && data.actor !== 'teacher') {
       submittedReviewMode = true;
       progressReviewMode = false;
       state.submissionId = data.saveId || progressSaveId;
@@ -609,13 +609,14 @@
     lockSubmittedPage();
     var resultBox = document.getElementById('portal-result');
     resultBox.hidden = false;
-    resultBox.innerHTML = '<span class="result-kicker">Live student progress</span><div class="result-score"><strong>' +
+    var teacherSubmitted = data.status === 'submitted' && data.actor === 'teacher';
+    resultBox.innerHTML = '<span class="result-kicker">' + (teacherSubmitted ? 'Submitted by Teacher' : 'Live student progress') + '</span><div class="result-score"><strong>' +
       escapeHtml(data.answeredCount) + ' / ' + escapeHtml(data.questionCount) +
-      '</strong><span>answers currently synced</span></div><p>Read-only view of Joy’s latest saved work. This page refreshes automatically every five seconds. Last server update: <strong>' +
+      '</strong><span>' + (teacherSubmitted ? 'answers preserved' : 'answers currently synced') + '</span></div><p>' + (teacherSubmitted ? 'The Teacher marked this saved work as submitted without creating a score or graded result.' : 'Read-only view of Joy’s latest saved work. This page refreshes automatically every five seconds.') + ' Last server update: <strong>' +
       escapeHtml(formatReviewTime(data.updatedAt)) + '</strong>.</p>';
     document.getElementById('portal-submit-copy').hidden = true;
-    document.getElementById('portal-unanswered').textContent = data.status === 'submitted' ? 'Final submission received' : 'Work still in progress';
-    document.getElementById('portal-submit').textContent = 'Read-only live view';
+    document.getElementById('portal-unanswered').textContent = teacherSubmitted ? 'Submitted by Teacher' : 'Work still in progress';
+    document.getElementById('portal-submit').textContent = teacherSubmitted ? 'Read-only submitted view' : 'Read-only live view';
     document.getElementById('difficulty-panel').hidden = true;
   }
 
