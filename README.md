@@ -11,7 +11,7 @@ Role boundary: **Joy is the student** and **Teacher** is the generic private sta
 - `2026-07-20/` contains the full Inferences handout completed across Classes 13-14, the assigned original full 20-question Inferences practice, and the assigned 10-question annotated Words in Context preview for Class 15. No Class 14 summary or reflection is published yet.
 - `class-12/` contains Homework 1, the 20-question Command of Evidence assignment.
 - `boosters/skill-booster/` contains four SAT domains, ten leaf skills, and thirty homework-style practice pages. All 640 retained questions are embedded directly in HTML cards with native answer controls; the public pages and asset paths contain no source question IDs.
-- `mistake-logbook/` is Joy's learner-only review space. It derives wrong answers from submitted homework, Vocabulary Lab, Reading Lab, and Intensive Skill Booster results; shows at most 20 entries per page; and builds mixed or filtered auto-checked redo sets of at most 40 unique questions.
+- `mistake-logbook/` is Joy's learner-only review space. It renders each past mistake question directly with the past selected answer, without assignment/question-number framing or an original-question link; shows at most 20 questions per page; and builds mixed or filtered auto-checked redo sets of at most 40 unique questions.
 - `assets/` contains the reusable interface, autosave, progress, PDF-print controls, incomplete-submission confirmation, required submitted names, Teacher-controlled Check and Explain modes, Teacher-controlled handout answer/annotation reveal, difficult-question flags, mock-exam answer grid, and submission behavior.
 - Teacher versions, answer keys, and the private saving service are intentionally excluded from the hosted repository.
 

@@ -31,7 +31,7 @@
       'clear-filters', 'practice-mixed', 'practice-filtered', 'logbook-status',
       'mistake-list', 'result-count', 'previous-page', 'next-page', 'page-label',
       'practice-section', 'practice-kicker', 'practice-title', 'practice-intro',
-      'practice-status', 'practice-sources', 'practice-form', 'practice-questions',
+      'practice-status', 'practice-form', 'practice-questions',
       'practice-progress', 'submit-practice', 'practice-result', 'close-practice',
       'print-button'
     ].forEach(function (id) {
@@ -126,46 +126,65 @@
       showLogbookStatus('No mistakes match these filters.', false);
       return;
     }
-    elements['logbook-status'].hidden = true;
-    items.forEach(function (item) {
-      var card = document.createElement('article');
-      card.className = 'mistake-card';
-
-      var copy = document.createElement('div');
-      var title = document.createElement('h3');
-      title.textContent = item.assignmentLabel + ' · Question ' + item.questionNumber;
-      var type = document.createElement('p');
-      type.textContent = item.domain + ' · ' + item.skill;
-      var meta = document.createElement('div');
-      meta.className = 'mistake-meta';
-      [item.source, item.theme, 'Missed ' + item.originAttemptCount + ' time' + (item.originAttemptCount === 1 ? '' : 's')].forEach(function (value) {
-        var tag = document.createElement('span');
-        tag.textContent = value;
-        meta.appendChild(tag);
-      });
-      var source = document.createElement('a');
-      source.className = 'source-link';
-      source.href = sourceUrl(item);
-      source.target = '_blank';
-      source.rel = 'noopener';
-      source.textContent = item.sourceKind === 'pdf' ? 'Open original question booklet →' : 'Open original question →';
-      copy.append(title, type, meta, source);
-
-      var answer = document.createElement('div');
-      answer.className = 'mistake-answer';
-      var pill = document.createElement('span');
-      pill.className = 'status-pill ' + item.status;
-      pill.textContent = statusLabel(item.status);
-      var selected = document.createElement('strong');
-      selected.textContent = 'Your past answer: ' + (item.selectedAnswer || 'Blank');
-      var date = document.createElement('p');
-      date.textContent = item.lastPracticeAt
-        ? 'Last redo ' + formatDate(item.lastPracticeAt) + ' · ' + item.practiceCount + ' total redo' + (item.practiceCount === 1 ? '' : 's')
-        : 'Not redone yet';
-      answer.append(pill, selected, date);
-      card.append(copy, answer);
-      elements['mistake-list'].appendChild(card);
+    showLogbookStatus('Loading mistake questions…', false);
+    Promise.all(items.map(buildMistakeCard)).then(function (cards) {
+      elements['mistake-list'].replaceChildren.apply(elements['mistake-list'], cards);
+      elements['logbook-status'].hidden = true;
+    }).catch(function () {
+      showLogbookStatus('Some mistake questions could not be displayed. Reload the page to try again.', true);
     });
+  }
+
+  function buildMistakeCard(item) {
+    var card = document.createElement('article');
+    card.className = 'mistake-card';
+    var status = document.createElement('div');
+    status.className = 'mistake-card-status';
+    var pill = document.createElement('span');
+    pill.className = 'status-pill ' + item.status;
+    pill.textContent = statusLabel(item.status);
+    status.appendChild(pill);
+    card.appendChild(status);
+
+    return loadSourceQuestion(item).then(function (source) {
+      card.append(source.content, buildPastAnswerChoices(item, source.choices));
+      return card;
+    }).catch(function () {
+      card.classList.add('is-unavailable');
+      var message = document.createElement('p');
+      message.className = 'question-unavailable';
+      message.textContent = 'This question could not be displayed. Reload the page to try again.';
+      card.appendChild(message);
+      return card;
+    });
+  }
+
+  function buildPastAnswerChoices(item, choices) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'redo-choices past-answer-choices';
+    choices.slice(0, 4).forEach(function (choiceText, index) {
+      var letter = String.fromCharCode(65 + index);
+      var choice = document.createElement('div');
+      choice.className = 'redo-choice past-answer-choice';
+      var text = document.createElement('span');
+      text.textContent = choiceText;
+      choice.appendChild(text);
+      if (letter === item.selectedAnswer) {
+        choice.classList.add('is-past-answer');
+        var label = document.createElement('strong');
+        label.className = 'past-answer-label';
+        label.textContent = 'Past answer';
+        choice.appendChild(label);
+      }
+      wrapper.appendChild(choice);
+    });
+    if (!item.selectedAnswer) {
+      var blank = document.createElement('p');
+      blank.className = 'past-answer-blank';
+      blank.textContent = 'Past answer: Blank';
+      wrapper.appendChild(blank);
+    }
+    return wrapper;
   }
 
   function renderPager(data) {
@@ -214,14 +233,12 @@
       : 'A focused sample from the filters currently selected above.';
     elements['practice-status'].hidden = false;
     elements['practice-status'].className = 'status-message';
-    elements['practice-status'].textContent = 'Loading the original question content…';
-    elements['practice-sources'].replaceChildren();
+    elements['practice-status'].textContent = 'Loading question content…';
     elements['practice-questions'].replaceChildren();
     elements['practice-result'].hidden = true;
     elements['practice-result'].replaceChildren();
     elements['submit-practice'].disabled = false;
     elements['submit-practice'].textContent = 'Submit and check';
-    renderPdfSources(practice.items);
 
     Promise.all(practice.items.map(function (item, index) {
       return buildPracticeQuestion(item, index + 1);
@@ -230,36 +247,6 @@
       elements['practice-status'].hidden = true;
       updatePracticeProgress();
       elements['practice-section'].scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  }
-
-  function renderPdfSources(items) {
-    var grouped = {};
-    items.filter(function (item) { return item.sourceKind === 'pdf'; }).forEach(function (item) {
-      if (!grouped[item.sourcePath]) grouped[item.sourcePath] = { label: item.assignmentLabel, numbers: [] };
-      grouped[item.sourcePath].numbers.push(item.questionNumber);
-    });
-    Object.keys(grouped).forEach(function (path) {
-      var source = grouped[path];
-      source.numbers.sort(function (left, right) { return left - right; });
-      var details = document.createElement('details');
-      details.className = 'source-panel';
-      var summary = document.createElement('summary');
-      summary.textContent = source.label + ' · Questions ' + source.numbers.join(', ');
-      var body = document.createElement('div');
-      body.className = 'source-panel-body';
-      var link = document.createElement('a');
-      link.href = publicPathUrl(path);
-      link.target = '_blank';
-      link.rel = 'noopener';
-      link.textContent = 'Open this booklet in a new tab →';
-      var iframe = document.createElement('iframe');
-      iframe.loading = 'lazy';
-      iframe.src = publicPathUrl(path) + '#view=FitH';
-      iframe.title = source.label + ' question booklet';
-      body.append(link, iframe);
-      details.append(summary, body);
-      elements['practice-sources'].appendChild(details);
     });
   }
 
@@ -272,44 +259,23 @@
     header.className = 'practice-question-header';
     var heading = document.createElement('div');
     var title = document.createElement('h3');
-    title.textContent = 'Practice ' + practiceNumber;
-    var subtitle = document.createElement('p');
-    subtitle.textContent = item.assignmentLabel + ' · Original Question ' + item.questionNumber;
-    heading.append(title, subtitle);
+    title.textContent = 'Redo ' + practiceNumber;
+    heading.appendChild(title);
     var tags = document.createElement('div');
     tags.className = 'question-tags';
-    [item.skill, item.source].forEach(function (value) {
-      var tag = document.createElement('span');
-      tag.textContent = value;
-      tags.appendChild(tag);
-    });
+    var tag = document.createElement('span');
+    tag.textContent = item.skill;
+    tags.appendChild(tag);
     header.append(heading, tags);
     card.appendChild(header);
-
-    if (item.sourceKind === 'pdf') {
-      var note = document.createElement('div');
-      note.className = 'pdf-question-note';
-      var noteTitle = document.createElement('strong');
-      noteTitle.textContent = 'Use Question ' + item.questionNumber + ' in the booklet above.';
-      var noteText = document.createElement('span');
-      noteText.textContent = ' Read the full passage and choices there, then record your answer below.';
-      note.append(noteTitle, noteText);
-      card.append(note, buildChoiceControls(item, ['A.', 'B.', 'C.', 'D.']));
-      return Promise.resolve(card);
-    }
 
     return loadSourceQuestion(item).then(function (source) {
       card.append(source.content, buildChoiceControls(item, source.choices));
       return card;
     }).catch(function () {
-      var note = document.createElement('div');
-      note.className = 'pdf-question-note';
-      var link = document.createElement('a');
-      link.href = sourceUrl(item);
-      link.target = '_blank';
-      link.rel = 'noopener';
-      link.textContent = 'Open Original Question ' + item.questionNumber + ' →';
-      note.append('The original question could not be displayed here. ', link);
+      var note = document.createElement('p');
+      note.className = 'question-unavailable';
+      note.textContent = 'This question could not be displayed. Close this session and try again.';
       card.append(note, buildChoiceControls(item, ['A.', 'B.', 'C.', 'D.']));
       return card;
     });
@@ -338,8 +304,13 @@
       var clone = original.cloneNode(true);
       clone.classList.add('source-question');
       clone.removeAttribute('id');
-      clone.querySelectorAll('.choices, .work, .micro-check, textarea, input, button, script, style').forEach(function (node) {
+      clone.querySelectorAll('.qhead, .choices, .answer-prompt, .work, .micro-check, textarea, input, button, script, style').forEach(function (node) {
         node.remove();
+      });
+      clone.querySelectorAll('img').forEach(function (image) {
+        var source = image.getAttribute('src');
+        if (source) image.setAttribute('src', new URL(source, publicPathUrl(path)).href);
+        image.alt = 'SAT question passage and answer choices';
       });
       return { content: clone, choices: choices.length ? choices : ['A.', 'B.', 'C.', 'D.'] };
     });
@@ -521,12 +492,6 @@
     document.head.appendChild(script);
   }
 
-  function sourceUrl(item) {
-    var url = publicPathUrl(item.sourcePath);
-    if (item.sourceKind === 'html') url += '#q-' + item.questionNumber;
-    return url;
-  }
-
   function publicPathUrl(path) {
     return new URL('../' + String(path || '').replace(/^\/+/, ''), window.location.href).href;
   }
@@ -554,12 +519,6 @@
 
   function statusLabel(status) {
     return status === 'recovered-once' ? 'Recovered once' : 'Needs review';
-  }
-
-  function formatDate(value) {
-    var date = new Date(value);
-    if (isNaN(date.getTime()) || date.getUTCFullYear() === 1970) return 'from the earlier homework archive';
-    return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
   }
 
   function number(value) {
