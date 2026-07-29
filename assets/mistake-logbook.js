@@ -7,7 +7,8 @@
     page: 1,
     totalPages: 1,
     currentPractice: null,
-    sourceCache: {}
+    sourceCache: {},
+    initialFilters: readInitialFilters()
   };
 
   var elements = {};
@@ -88,6 +89,11 @@
       state.totalPages = data.totalPages;
       renderSummary(data.summary || {});
       renderFilterOptions(data.filterOptions || {});
+      if (applyInitialFilters()) {
+        state.page = 1;
+        loadLogbook();
+        return;
+      }
       renderMistakes(data.items || [], (data.page - 1) * data.pageSize);
       renderPager(data);
     }, function () {
@@ -131,6 +137,33 @@
       numeric: true,
       sensitivity: 'base'
     });
+  }
+
+  function readInitialFilters() {
+    var parameters = new URLSearchParams(window.location.search);
+    var result = {};
+    ['source', 'domain', 'skill', 'theme', 'status'].forEach(function (key) {
+      var value = String(parameters.get(key) || '').trim();
+      if (value) result[key] = value;
+    });
+    return result;
+  }
+
+  function applyInitialFilters() {
+    var filters = state.initialFilters;
+    state.initialFilters = null;
+    if (!filters) return false;
+    var changed = false;
+    Object.keys(filters).forEach(function (key) {
+      var select = elements['filter-' + key];
+      if (!select) return;
+      if (!Array.from(select.options).some(function (option) { return option.value === filters[key]; })) return;
+      if (select.value !== filters[key]) {
+        select.value = filters[key];
+        changed = true;
+      }
+    });
+    return changed;
   }
 
   function applyReviewVisibility() {
