@@ -82,21 +82,33 @@ h1 { max-width: 12ch; margin: 0; font-size: clamp(48px, 7vw, 80px); line-height:
 button:disabled { opacity: .5; cursor: not-allowed; }
 
 .result-count { color: var(--muted); font-size: 12px; }
+.logbook-section > .section-heading { align-items: center; }
+.review-heading-tools { display: flex; align-items: center; justify-content: flex-end; gap: 16px; }
+.review-controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.review-controls label { display: flex; align-items: center; gap: 6px; min-height: 34px; padding: 5px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 12px; font-weight: 750; cursor: pointer; }
+.review-controls input { width: 16px; height: 16px; margin: 0; accent-color: var(--ink); }
 .status-message { margin-top: 17px; padding: 13px 14px; border-radius: 8px; color: var(--muted); background: rgba(255, 255, 255, .58); font-size: 13px; }
 .status-message.is-error { color: var(--red); background: var(--red-soft); }
 .status-message.is-success { color: var(--green); background: var(--green-soft); }
 .mistake-list { display: grid; gap: 18px; margin-top: 18px; }
 .mistake-card { padding: 23px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); }
-.mistake-card-status { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+.mistake-card-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
+.mistake-card-header h3 { margin: 0; font-size: 18px; }
+.mistake-card-status { display: flex; justify-content: flex-end; }
 .question-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .question-tags span, .status-pill { padding: 4px 8px; border-radius: 999px; background: var(--navy-soft); color: var(--navy); font-size: 10px; font-weight: 800; }
 .status-pill.needs-review { color: var(--red); background: var(--red-soft); }
 .status-pill.recovered-once { color: var(--green); background: var(--green-soft); }
 .past-answer-choices .past-answer-choice { cursor: default; }
 .past-answer-choices .past-answer-choice:hover { border-color: var(--line); }
-.past-answer-choice.is-past-answer { border-color: var(--red); color: var(--red); background: var(--red-soft); }
-.past-answer-label { flex: 0 0 auto; margin-left: auto; padding-left: 10px; font-size: 10px; letter-spacing: .03em; text-transform: uppercase; }
-.past-answer-blank { margin: 4px 0 0; padding: 10px 12px; border-left: 4px solid var(--red); color: var(--red); background: var(--red-soft); font-size: 12px; font-weight: 800; }
+.past-answer-label, .correct-answer-label { display: none; flex: 0 0 auto; margin-left: auto; padding-left: 10px; font-size: 10px; letter-spacing: .03em; text-transform: uppercase; }
+.correct-answer-label { color: var(--green); }
+.past-answer-blank { display: none; margin: 4px 0 0; padding: 10px 12px; border-left: 4px solid var(--red); color: var(--red); background: var(--red-soft); font-size: 12px; font-weight: 800; }
+.logbook-section.show-mistakes .past-answer-choice.is-past-answer { border-color: var(--red); color: var(--red); background: var(--red-soft); }
+.logbook-section.show-mistakes .past-answer-label, .logbook-section.show-mistakes .past-answer-blank { display: block; }
+.logbook-section.show-answers .past-answer-choice.is-correct-answer { border-color: var(--green); color: var(--green); background: var(--green-soft); }
+.logbook-section.show-answers .correct-answer-label { display: block; }
+.logbook-section:not(.show-mistakes) .mistake-card-status { display: none; }
 .question-unavailable { margin: 14px 0 0; padding: 14px; color: var(--red); background: var(--red-soft); font-size: 13px; }
 .pager { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 20px; }
 .pager span { color: var(--muted); font-size: 12px; }
@@ -113,6 +125,7 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .source-question { margin-top: 14px; }
 .source-question > .qhead { display: none; }
 .source-question .passage, .source-question .qtext, .source-question .stem { font-family: Georgia, "Times New Roman", serif; line-height: 1.68; }
+.source-question .logbook-question-prompt { font-weight: 850; }
 .source-question img { max-width: 100%; height: auto; }
 .source-question table { width: 100%; border-collapse: collapse; }
 .source-question th, .source-question td { padding: 7px; border: 1px solid var(--line); text-align: left; font-size: 12px; }
@@ -142,6 +155,8 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   h1 { font-size: 50px; }
   .summary-grid, .filter-grid { grid-template-columns: 1fr; }
   .section-heading, .practice-heading, .submit-panel { align-items: stretch; flex-direction: column; }
+  .review-heading-tools { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .review-controls { justify-content: flex-start; }
   .practice-heading { display: grid; }
   .submit-panel { display: grid; bottom: 6px; }
   .primary-button, .secondary-button { width: 100%; }

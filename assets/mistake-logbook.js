@@ -14,6 +14,7 @@
   onReady(function () {
     cacheElements();
     bindEvents();
+    applyReviewVisibility();
     if (!window.JoyPortalAccess || !window.JoyPortalAccess.ready) {
       showLogbookStatus('Portal access could not be initialized.', true);
       return;
@@ -29,7 +30,8 @@
       'summary-total', 'summary-needs', 'summary-recovered',
       'filter-source', 'filter-domain', 'filter-skill', 'filter-theme', 'filter-status',
       'clear-filters', 'practice-mixed', 'practice-filtered', 'logbook-status',
-      'mistake-list', 'result-count', 'previous-page', 'next-page', 'page-label',
+      'logbook-section', 'mistake-list', 'result-count', 'show-answers', 'show-mistakes',
+      'previous-page', 'next-page', 'page-label',
       'practice-section', 'practice-kicker', 'practice-title', 'practice-intro',
       'practice-status', 'practice-form', 'practice-questions',
       'practice-progress', 'submit-practice', 'practice-result', 'close-practice',
@@ -70,6 +72,8 @@
     elements['practice-questions'].addEventListener('change', updatePracticeProgress);
     elements['close-practice'].addEventListener('click', closePractice);
     elements['print-button'].addEventListener('click', function () { window.print(); });
+    elements['show-answers'].addEventListener('change', applyReviewVisibility);
+    elements['show-mistakes'].addEventListener('change', applyReviewVisibility);
   }
 
   function loadLogbook() {
@@ -84,7 +88,7 @@
       state.totalPages = data.totalPages;
       renderSummary(data.summary || {});
       renderFilterOptions(data.filterOptions || {});
-      renderMistakes(data.items || []);
+      renderMistakes(data.items || [], (data.page - 1) * data.pageSize);
       renderPager(data);
     }, function () {
       showLogbookStatus('The Mistake Logbook connection is unavailable. Please try again.', true);
@@ -101,17 +105,19 @@
     renderSelectOptions(elements['filter-source'], options.source || [], 'All sources');
     renderSelectOptions(elements['filter-domain'], options.domain || [], 'All domains');
     renderSelectOptions(elements['filter-skill'], options.skill || [], 'All question types');
-    renderSelectOptions(elements['filter-theme'], options.theme || [], 'All topics and themes');
+    renderSelectOptions(elements['filter-theme'], options.theme || [], 'All topics and themes', naturalOptionCompare);
   }
 
-  function renderSelectOptions(select, options, allLabel) {
+  function renderSelectOptions(select, options, allLabel, compare) {
     var selected = select.value;
+    var ordered = options.slice();
+    if (compare) ordered.sort(compare);
     select.replaceChildren();
     var all = document.createElement('option');
     all.value = '';
     all.textContent = allLabel;
     select.appendChild(all);
-    options.forEach(function (item) {
+    ordered.forEach(function (item) {
       var option = document.createElement('option');
       option.value = item.value;
       option.textContent = item.value + ' (' + item.count + ')';
@@ -120,14 +126,28 @@
     if (Array.from(select.options).some(function (option) { return option.value === selected; })) select.value = selected;
   }
 
-  function renderMistakes(items) {
+  function naturalOptionCompare(left, right) {
+    return String(left.value).localeCompare(String(right.value), undefined, {
+      numeric: true,
+      sensitivity: 'base'
+    });
+  }
+
+  function applyReviewVisibility() {
+    elements['logbook-section'].classList.toggle('show-answers', elements['show-answers'].checked);
+    elements['logbook-section'].classList.toggle('show-mistakes', elements['show-mistakes'].checked);
+  }
+
+  function renderMistakes(items, startIndex) {
     elements['mistake-list'].replaceChildren();
     if (!items.length) {
       showLogbookStatus('No mistakes match these filters.', false);
       return;
     }
     showLogbookStatus('Loading mistake questions…', false);
-    Promise.all(items.map(buildMistakeCard)).then(function (cards) {
+    Promise.all(items.map(function (item, index) {
+      return buildMistakeCard(item, startIndex + index + 1);
+    })).then(function (cards) {
       elements['mistake-list'].replaceChildren.apply(elements['mistake-list'], cards);
       elements['logbook-status'].hidden = true;
     }).catch(function () {
@@ -135,16 +155,21 @@
     });
   }
 
-  function buildMistakeCard(item) {
+  function buildMistakeCard(item, displayNumber) {
     var card = document.createElement('article');
     card.className = 'mistake-card';
+    var header = document.createElement('div');
+    header.className = 'mistake-card-header';
+    var title = document.createElement('h3');
+    title.textContent = 'Question ' + displayNumber;
     var status = document.createElement('div');
     status.className = 'mistake-card-status';
     var pill = document.createElement('span');
     pill.className = 'status-pill ' + item.status;
     pill.textContent = statusLabel(item.status);
     status.appendChild(pill);
-    card.appendChild(status);
+    header.append(title, status);
+    card.appendChild(header);
 
     return loadSourceQuestion(item).then(function (source) {
       card.append(source.content, buildPastAnswerChoices(item, source.choices));
@@ -169,6 +194,13 @@
       var text = document.createElement('span');
       text.textContent = choiceText;
       choice.appendChild(text);
+      if (letter === item.correctAnswer) {
+        choice.classList.add('is-correct-answer');
+        var correctLabel = document.createElement('strong');
+        correctLabel.className = 'correct-answer-label';
+        correctLabel.textContent = 'Correct answer';
+        choice.appendChild(correctLabel);
+      }
       if (letter === item.selectedAnswer) {
         choice.classList.add('is-past-answer');
         var label = document.createElement('strong');
@@ -305,9 +337,15 @@
       var clone = original.cloneNode(true);
       clone.classList.add('source-question');
       clone.removeAttribute('id');
-      clone.querySelectorAll('.qhead, .choices, .answer-prompt, .work, .micro-check, textarea, input, button, script, style').forEach(function (node) {
+      clone.querySelectorAll('.qhead, .q-head, .choices, .answer-prompt, .work, .micro-check, .hint, .hintbody, .hint-rule, .hint-line, .nohint, .reading-map, textarea, input, button, script, style').forEach(function (node) {
         node.remove();
       });
+      var prompt = clone.querySelector('.stem, .prompt, .question-prompt');
+      if (!prompt) {
+        var paragraphs = clone.querySelectorAll('p');
+        prompt = paragraphs.length ? paragraphs[paragraphs.length - 1] : null;
+      }
+      if (prompt) prompt.classList.add('logbook-question-prompt');
       clone.querySelectorAll('img').forEach(function (image) {
         var source = image.getAttribute('src');
         if (source) image.setAttribute('src', new URL(source, publicPathUrl(path)).href);

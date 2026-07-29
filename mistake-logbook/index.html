@@ -57,14 +57,19 @@
       <div class="practice-actions">
         <button class="primary-button" id="practice-mixed" type="button">Practice a mix of all past mistakes</button>
         <button class="secondary-button" id="practice-filtered" type="button">Practice this filtered set</button>
-        <p>Each redo session contains up to 40 unique questions and checks automatically after submission.</p>
       </div>
     </section>
 
-    <section class="logbook-section" id="logbook-section" aria-labelledby="logbook-title">
+    <section class="logbook-section show-mistakes" id="logbook-section" aria-labelledby="logbook-title">
       <div class="section-heading">
-        <div><p class="eyebrow">Up to 20 per page</p><h2 id="logbook-title">Past mistake questions</h2></div>
-        <span id="result-count" class="result-count">Loading…</span>
+        <h2 id="logbook-title">Past mistake questions</h2>
+        <div class="review-heading-tools">
+          <div class="review-controls" role="group" aria-label="Review display">
+            <label><input id="show-answers" type="checkbox"> Show answers</label>
+            <label><input id="show-mistakes" type="checkbox" checked> Show mistakes</label>
+          </div>
+          <span id="result-count" class="result-count">Loading…</span>
+        </div>
       </div>
       <div id="logbook-status" class="status-message" role="status">Loading your submitted mistakes…</div>
       <div id="mistake-list" class="mistake-list"></div>
@@ -92,6 +97,6 @@
     </section>
   </main>
 
-  <script src="../assets/mistake-logbook.js?v=20260729-direct-feed-2"></script>
+  <script src="../assets/mistake-logbook.js?v=20260729-review-controls"></script>
 </body>
 </html>
