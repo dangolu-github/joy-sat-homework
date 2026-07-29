@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="../assets/access-gate.js?v=20260729-mistake-logbook"></script>
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <title>Mistake Logbook · Joy SAT</title>
+  <link rel="stylesheet" href="../assets/mistake-logbook.css?v=20260729">
+</head>
+<body>
+  <nav class="logbook-bar">
+    <a class="logbook-brand" href="../">← Joy SAT workspace</a>
+    <div class="logbook-actions">
+      <button class="quiet-button" id="print-button" type="button">Save as PDF</button>
+      <span>Learner self-practice</span>
+    </div>
+  </nav>
+
+  <main class="logbook-page">
+    <header class="logbook-hero">
+      <div>
+        <p class="eyebrow">Review · Retry · Recover</p>
+        <h1>Mistake Logbook</h1>
+        <p class="hero-copy">Review wrong answers from submitted homework, Vocabulary Lab, Reading Lab, and Skill Booster practice. Filter the log, then build a mixed or focused redo set.</p>
+      </div>
+      <aside class="hero-note">
+        <strong>One correct redo means “Recovered once.”</strong>
+        Your original mistake stays in the history. A correct self-check is useful recovery evidence, but it is not a mastery label.
+      </aside>
+    </header>
+
+    <section class="summary-grid" aria-label="Mistake summary">
+      <article><span>Past mistakes</span><strong id="summary-total">—</strong></article>
+      <article><span>Needs review</span><strong id="summary-needs">—</strong></article>
+      <article><span>Recovered once</span><strong id="summary-recovered">—</strong></article>
+    </section>
+
+    <section class="filter-panel" aria-labelledby="filter-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">Find a pattern</p><h2 id="filter-title">Filter your logbook</h2></div>
+        <button class="text-button" id="clear-filters" type="button">Clear filters</button>
+      </div>
+      <div class="filter-grid">
+        <label>Practice source<select id="filter-source"><option value="">All sources</option></select></label>
+        <label>SAT domain<select id="filter-domain"><option value="">All domains</option></select></label>
+        <label>Question type<select id="filter-skill"><option value="">All question types</option></select></label>
+        <label>Topic or theme<select id="filter-theme"><option value="">All topics and themes</option></select></label>
+        <label>Recovery status
+          <select id="filter-status">
+            <option value="">All statuses</option>
+            <option value="needs-review" selected>Needs review</option>
+            <option value="recovered-once">Recovered once</option>
+          </select>
+        </label>
+      </div>
+      <div class="practice-actions">
+        <button class="primary-button" id="practice-mixed" type="button">Practice a mix of all past mistakes</button>
+        <button class="secondary-button" id="practice-filtered" type="button">Practice this filtered set</button>
+        <p>Each redo session contains up to 40 unique questions and checks automatically after submission.</p>
+      </div>
+    </section>
+
+    <section class="logbook-section" id="logbook-section" aria-labelledby="logbook-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">Maximum 20 per page</p><h2 id="logbook-title">Mistake entries</h2></div>
+        <span id="result-count" class="result-count">Loading…</span>
+      </div>
+      <div id="logbook-status" class="status-message" role="status">Loading your submitted mistakes…</div>
+      <div id="mistake-list" class="mistake-list"></div>
+      <nav class="pager" aria-label="Mistake pages">
+        <button id="previous-page" type="button">← Previous</button>
+        <span id="page-label">Page 1 of 1</span>
+        <button id="next-page" type="button">Next →</button>
+      </nav>
+    </section>
+
+    <section class="practice-section" id="practice-section" hidden aria-labelledby="practice-title">
+      <div class="practice-heading">
+        <div><p class="eyebrow" id="practice-kicker">Self-check practice</p><h2 id="practice-title">Redo session</h2><p id="practice-intro"></p></div>
+        <button class="quiet-button" id="close-practice" type="button">Close practice</button>
+      </div>
+      <div id="practice-status" class="status-message" role="status"></div>
+      <div id="practice-sources" class="practice-sources"></div>
+      <form id="practice-form">
+        <div id="practice-questions" class="practice-questions"></div>
+        <div class="submit-panel">
+          <div><strong id="practice-progress">0 of 0 answered</strong><p>Blank answers are allowed after confirmation and count as incorrect.</p></div>
+          <button class="primary-button" id="submit-practice" type="submit">Submit and check</button>
+        </div>
+      </form>
+      <div id="practice-result" class="practice-result" hidden></div>
+    </section>
+  </main>
+
+  <script src="../assets/mistake-logbook.js?v=20260729"></script>
+</body>
+</html>
