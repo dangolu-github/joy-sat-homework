@@ -293,6 +293,7 @@
     }
     return state.sourceCache[path].then(function (documentSource) {
       var questions = documentSource.querySelectorAll('.question');
+      if (!questions.length) questions = documentSource.querySelectorAll('main > article');
       var original = questions[item.questionNumber - 1];
       if (!original) throw new Error('Question not found.');
       var choiceNodes = original.querySelectorAll('.choice');
