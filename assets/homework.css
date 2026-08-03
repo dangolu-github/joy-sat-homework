@@ -55,7 +55,7 @@ body.portal-ready .choices { grid-template-columns: 1fr !important; gap: 10px !i
 body.portal-ready .choice {
   position: relative;
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
+  grid-template-columns: 24px minmax(0, 1fr) auto;
   gap: 12px;
   align-items: start;
   padding: 14px 15px !important;
