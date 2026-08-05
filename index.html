@@ -108,16 +108,35 @@
 <div>
 <p class="eyebrow">Reading &amp; Writing</p>
 <h1>Joy’s SAT workspace</h1>
-<p class="page-intro">Class materials, English reviews, homework, and released feedback—organized by class number, date, and title.</p>
+<p class="page-intro">Round 1 built the knowledge foundations. From August 5, Round 2 turns that knowledge into systematic mixed review, error repair, and timed transfer.</p>
 </div>
 <span class="workspace-status">
 <i>
 </i> Personal course space</span>
 </header>
-<section class="month-section class-logbook-section" id="class-logbook">
+<nav class="course-round-switcher" id="class-logbook" role="tablist" aria-label="Course round">
+<button class="course-round-tab is-active" type="button" role="tab" aria-selected="true" data-course-round="round2">
+<span>Round 2 · Current</span><strong>Systematic Review</strong><small>From August 5</small>
+</button>
+<button class="course-round-tab" type="button" role="tab" aria-selected="false" data-course-round="round1">
+<span>Round 1 · Complete</span><strong>Knowledge Foundations</strong><small>Classes 1–19</small>
+</button>
+</nav>
+<section class="month-section class-logbook-section course-round-panel" data-course-round-panel="round2">
 <div class="section-heading">
-<h2>Class Logbook</h2>
-<span>19 classes</span>
+<h2>Round 2 Class Logbook</h2>
+<span>Systematic review begins</span>
+</div>
+<div class="round-start-card">
+<time datetime="2026-08-05"><span>Aug</span><strong>05</strong></time>
+<div><p class="round-start-kicker">Class 20</p><h3>Comprehensive Module Training I</h3><p>Use mixed SAT work to identify weak categories, then send new homework and Intensive Skill Booster mistakes to the Round 2 Mistake Logbook.</p></div>
+<a href="boosters/skill-booster/">Open Intensive Practice →</a>
+</div>
+</section>
+<section class="month-section class-logbook-section course-round-panel" data-course-round-panel="round1" hidden>
+<div class="section-heading">
+<h2>Round 1 Class Logbook</h2>
+<span>19 foundation classes</span>
 </div>
 <details class="class-logbook-period" data-logbook-period="2026-08" open>
 <summary><span>August 2026</span><small>1 class</small></summary>
@@ -523,7 +542,7 @@
 </a>
 </div>
 </section>
-<script src="assets/home.js?v=20260729-logbook"></script>
+<script src="assets/home.js?v=20260805-course-rounds"></script>
 </main>
 </div>
 </body>

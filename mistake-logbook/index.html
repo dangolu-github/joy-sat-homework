@@ -6,7 +6,7 @@
   <script src="../assets/access-gate.js?v=20260729-mistake-direct-feed"></script>
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>Mistake Logbook · Joy SAT</title>
-  <link rel="stylesheet" href="../assets/mistake-logbook.css?v=20260729-direct-feed">
+  <link rel="stylesheet" href="../assets/mistake-logbook.css?v=20260805-rounds-removal">
 </head>
 <body>
   <nav class="logbook-bar">
@@ -22,13 +22,22 @@
       <div>
         <p class="eyebrow">Review · Retry · Recover</p>
         <h1>Mistake Logbook</h1>
-        <p class="hero-copy">Review wrong answers from submitted Homework, Vocabulary Lab, Reading Lab, Intensive Practice, and Mock Exam work. Each mistake question appears directly below.</p>
+        <p class="hero-copy">Review wrong answers from Homework, Intensive Practice, and Mock Exam work. Round 1 keeps the foundation history; new work from August 5 enters Round 2.</p>
       </div>
       <aside class="hero-note">
         <strong>One correct redo means “Recovered once.”</strong>
-        Your original mistake stays in the history. A correct self-check is useful recovery evidence, but it is not a mastery label.
+        Your original homework result stays in the history. You can remove a question from this logbook when it is no longer useful to review.
       </aside>
     </header>
+
+    <nav class="round-switcher" role="tablist" aria-label="Mistake Logbook round">
+      <button id="round-2-tab" class="round-tab is-active" type="button" role="tab" aria-selected="true" data-round="round2">
+        <span>Round 2</span><strong>Systematic Review</strong><small><b id="round-2-count">0</b> mistakes</small>
+      </button>
+      <button id="round-1-tab" class="round-tab" type="button" role="tab" aria-selected="false" data-round="round1">
+        <span>Round 1</span><strong>Knowledge Foundations</strong><small><b id="round-1-count">0</b> mistakes</small>
+      </button>
+    </nav>
 
     <section class="summary-grid" aria-label="Mistake summary">
       <article><span>Past mistakes</span><strong id="summary-total">—</strong></article>
@@ -55,14 +64,14 @@
         </label>
       </div>
       <div class="practice-actions">
-        <button class="primary-button" id="practice-mixed" type="button">Practice a mix of all past mistakes</button>
+        <button class="primary-button" id="practice-mixed" type="button">Practice a mix from this round</button>
         <button class="secondary-button" id="practice-filtered" type="button">Practice this filtered set</button>
       </div>
     </section>
 
     <section class="logbook-section show-mistakes" id="logbook-section" aria-labelledby="logbook-title">
       <div class="section-heading">
-        <h2 id="logbook-title">Past mistake questions</h2>
+        <h2 id="logbook-title">Round 2 mistake questions</h2>
         <div class="review-heading-tools">
           <div class="review-controls" role="group" aria-label="Review display">
             <label><input id="show-answers" type="checkbox"> Show answers</label>
@@ -97,6 +106,6 @@
     </section>
   </main>
 
-  <script src="../assets/mistake-logbook.js?v=20260729-review-controls"></script>
+  <script src="../assets/mistake-logbook.js?v=20260805-rounds-removal"></script>
 </body>
 </html>

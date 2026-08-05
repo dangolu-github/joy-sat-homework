@@ -8,7 +8,8 @@
     totalPages: 1,
     currentPractice: null,
     sourceCache: {},
-    initialFilters: readInitialFilters()
+    initialFilters: readInitialFilters(),
+    round: readInitialRound()
   };
 
   var elements = {};
@@ -29,9 +30,10 @@
   function cacheElements() {
     [
       'summary-total', 'summary-needs', 'summary-recovered',
+      'round-1-tab', 'round-2-tab', 'round-1-count', 'round-2-count',
       'filter-source', 'filter-domain', 'filter-skill', 'filter-theme', 'filter-status',
       'clear-filters', 'practice-mixed', 'practice-filtered', 'logbook-status',
-      'logbook-section', 'mistake-list', 'result-count', 'show-answers', 'show-mistakes',
+      'logbook-section', 'logbook-title', 'mistake-list', 'result-count', 'show-answers', 'show-mistakes',
       'previous-page', 'next-page', 'page-label',
       'practice-section', 'practice-kicker', 'practice-title', 'practice-intro',
       'practice-status', 'practice-form', 'practice-questions',
@@ -40,6 +42,7 @@
     ].forEach(function (id) {
       elements[id] = document.getElementById(id);
     });
+    selectRound(state.round, false);
   }
 
   function bindEvents() {
@@ -75,12 +78,17 @@
     elements['print-button'].addEventListener('click', function () { window.print(); });
     elements['show-answers'].addEventListener('change', applyReviewVisibility);
     elements['show-mistakes'].addEventListener('change', applyReviewVisibility);
+    ['round-1-tab', 'round-2-tab'].forEach(function (id) {
+      elements[id].addEventListener('click', function () {
+        selectRound(elements[id].dataset.round, true);
+      });
+    });
   }
 
   function loadLogbook() {
     showLogbookStatus('Loading your submitted mistakes…', false);
     elements['mistake-list'].replaceChildren();
-    request('getMistakeLogbook', Object.assign({ page: state.page }, currentFilters()), function (data) {
+    request('getMistakeLogbook', Object.assign({ page: state.page, environment: environment() }, currentFilters()), function (data) {
       if (!data || !data.ok) {
         showLogbookStatus((data && data.error) || 'The Mistake Logbook could not be loaded.', true);
         return;
@@ -88,6 +96,7 @@
       state.page = data.page;
       state.totalPages = data.totalPages;
       renderSummary(data.summary || {});
+      renderRoundSummary(data.roundSummary || {});
       renderFilterOptions(data.filterOptions || {});
       if (applyInitialFilters()) {
         state.page = 1;
@@ -105,6 +114,11 @@
     elements['summary-total'].textContent = number(summary.total);
     elements['summary-needs'].textContent = number(summary.needsReview);
     elements['summary-recovered'].textContent = number(summary.recoveredOnce);
+  }
+
+  function renderRoundSummary(summary) {
+    elements['round-1-count'].textContent = number(summary.round1 && summary.round1.total);
+    elements['round-2-count'].textContent = number(summary.round2 && summary.round2.total);
   }
 
   function renderFilterOptions(options) {
@@ -147,6 +161,25 @@
       if (value) result[key] = value;
     });
     return result;
+  }
+
+  function readInitialRound() {
+    var value = new URLSearchParams(window.location.search).get('round');
+    return value === 'round1' ? 'round1' : 'round2';
+  }
+
+  function selectRound(round, shouldLoad) {
+    state.round = round === 'round1' ? 'round1' : 'round2';
+    ['round1', 'round2'].forEach(function (value) {
+      var tab = elements[value === 'round1' ? 'round-1-tab' : 'round-2-tab'];
+      var active = value === state.round;
+      tab.classList.toggle('is-active', active);
+      tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      tab.tabIndex = active ? 0 : -1;
+    });
+    elements['logbook-title'].textContent = (state.round === 'round1' ? 'Round 1' : 'Round 2') + ' mistake questions';
+    state.page = 1;
+    if (shouldLoad && state.token) loadLogbook();
   }
 
   function applyInitialFilters() {
@@ -201,6 +234,12 @@
     pill.className = 'status-pill ' + item.status;
     pill.textContent = statusLabel(item.status);
     status.appendChild(pill);
+    var remove = document.createElement('button');
+    remove.className = 'remove-mistake-button';
+    remove.type = 'button';
+    remove.textContent = 'Remove from logbook';
+    remove.addEventListener('click', function () { dismissMistake(item, card, remove); });
+    status.appendChild(remove);
     header.append(title, status);
     card.appendChild(header);
 
@@ -214,6 +253,59 @@
       message.textContent = 'This question could not be displayed. Reload the page to try again.';
       card.appendChild(message);
       return card;
+    });
+  }
+
+  function dismissMistake(item, card, button) {
+    var roundLabel = item.round === 'round1' ? 'Round 1' : 'Round 2';
+    if (!window.confirm('Remove this question from the ' + roundLabel + ' Mistake Logbook? Your original homework result will stay unchanged.')) return;
+    var dismissalId = createId();
+    button.disabled = true;
+    button.textContent = 'Removing…';
+    var payload = {
+      action: 'dismissMistake',
+      accessToken: state.token,
+      dismissalId: dismissalId,
+      environment: environment(),
+      key: item.key
+    };
+    window.fetch(ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    }).then(function () {
+      pollDismissal(dismissalId, item, card, button, 0);
+    }).catch(function () {
+      button.disabled = false;
+      button.textContent = 'Remove from logbook';
+      showLogbookStatus('The question could not be removed. Please try again.', true);
+    });
+  }
+
+  function pollDismissal(dismissalId, item, card, button, attempt) {
+    request('getMistakeDismissalResult', { dismissalId: dismissalId }, function (data) {
+      if (data && data.ok && !data.pending && data.key === item.key) {
+        card.remove();
+        showLogbookStatus('Question removed from this logbook. Your original homework result is unchanged.', false);
+        window.setTimeout(loadLogbook, 450);
+        return;
+      }
+      if (attempt >= 20) {
+        button.disabled = false;
+        button.textContent = 'Remove from logbook';
+        showLogbookStatus('The removal is taking longer than expected. Reload to check again.', true);
+        return;
+      }
+      window.setTimeout(function () { pollDismissal(dismissalId, item, card, button, attempt + 1); }, 1000);
+    }, function () {
+      if (attempt >= 20) {
+        button.disabled = false;
+        button.textContent = 'Remove from logbook';
+        showLogbookStatus('The removal status is temporarily unavailable.', true);
+        return;
+      }
+      window.setTimeout(function () { pollDismissal(dismissalId, item, card, button, attempt + 1); }, 1000);
     });
   }
 
@@ -263,7 +355,8 @@
     setPracticeButtonsDisabled(true);
     var parameters = mode === 'filtered'
       ? Object.assign({ mode: mode }, currentFilters())
-      : { mode: mode };
+      : { mode: mode, round: state.round, environment: environment() };
+    parameters.environment = environment();
     request('getMistakePracticeSelection', parameters, function (data) {
       setPracticeButtonsDisabled(false);
       if (!data || !data.ok) {
@@ -532,6 +625,7 @@
 
   function currentFilters() {
     return {
+      round: state.round,
       source: elements['filter-source'].value,
       domain: elements['filter-domain'].value,
       skill: elements['filter-skill'].value,
@@ -591,6 +685,11 @@
 
   function statusLabel(status) {
     return status === 'recovered-once' ? 'Recovered once' : 'Needs review';
+  }
+
+  function createId() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
+    return 'dismiss-' + Date.now() + '-' + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2);
   }
 
   function number(value) {
