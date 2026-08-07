@@ -1,0 +1,982 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <title>Sentence Boundaries · Knowledge Review</title>
+  <style>
+    :root {
+      --ink: #17233b;
+      --muted: #5e6b82;
+      --paper: #fffdf9;
+      --page: #eef2f8;
+      --navy: #183865;
+      --blue: #2d67b2;
+      --blue-soft: #eaf3ff;
+      --gold: #d59529;
+      --gold-soft: #fff5dc;
+      --green: #19745d;
+      --green-soft: #e8f7f1;
+      --red: #ad3a45;
+      --red-soft: #fff0f1;
+      --line: #d8e0ec;
+      --shadow: 0 18px 45px rgba(25, 44, 77, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { width: 100%; max-width: 100%; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(45, 103, 178, 0.12), transparent 34rem),
+        linear-gradient(180deg, #f6f8fc 0, var(--page) 32rem);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.62;
+    }
+
+    button { font: inherit; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem max(1rem, calc((100vw - 1120px) / 2));
+      color: #fff;
+      background: rgba(20, 43, 77, 0.96);
+      backdrop-filter: blur(10px);
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .brand { font-weight: 800; letter-spacing: 0.02em; }
+    .brand { min-width: 0; }
+    .print-button {
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 999px;
+      padding: 0.48rem 0.9rem;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+    }
+    .print-button:hover { background: rgba(255, 255, 255, 0.2); }
+    .print-short { display: none; }
+
+    .page {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 2rem auto 4rem;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(250px, 0.6fr);
+      gap: 1.5rem;
+      padding: clamp(1.6rem, 4vw, 3.2rem);
+      color: #fff;
+      background: linear-gradient(135deg, #15335d 0%, #285f9d 72%, #3b7cc1 100%);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .hero > * { min-width: 0; }
+
+    .eyebrow {
+      margin: 0 0 0.55rem;
+      color: #cfe3ff;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, h4 { line-height: 1.18; }
+    h1 { margin: 0; font-size: clamp(2.25rem, 6vw, 4.6rem); letter-spacing: -0.05em; }
+    .subtitle { max-width: 44rem; margin: 1rem 0 0; color: #e7f0ff; font-size: 1.08rem; }
+    .hero-note {
+      align-self: end;
+      padding: 1.15rem;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .hero-note strong { display: block; margin-bottom: 0.35rem; color: #ffe5a9; }
+
+    .toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin: 1.25rem 0 0;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.84);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+    .toc a {
+      color: var(--navy);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 750;
+      padding: 0.38rem 0.72rem;
+      border-radius: 999px;
+      background: var(--blue-soft);
+    }
+
+    .section {
+      margin-top: 1.35rem;
+      padding: clamp(1.25rem, 3vw, 2.2rem);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 8px 24px rgba(25, 44, 77, 0.06);
+    }
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--line);
+    }
+    .section-kicker {
+      margin: 0 0 0.3rem;
+      color: var(--blue);
+      font-size: 0.75rem;
+      font-weight: 850;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    h2 { margin: 0; color: var(--navy); font-size: clamp(1.55rem, 3vw, 2.25rem); }
+    .section-heading p:last-child { margin: 0.45rem 0 0; color: var(--muted); }
+
+    .knowledge-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1.1rem;
+    }
+    .knowledge-card {
+      position: relative;
+      padding: 1.15rem;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+    .knowledge-card.wide { grid-column: 1 / -1; }
+    .point-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 2.1rem;
+      height: 2.1rem;
+      margin-bottom: 0.7rem;
+      color: #fff;
+      background: var(--blue);
+      border-radius: 10px;
+      font-weight: 850;
+    }
+    .knowledge-card h3 { margin: 0; color: var(--navy); font-size: 1.12rem; }
+    .rule { margin: 0.55rem 0 0; }
+
+    .demo {
+      margin-top: 0.8rem;
+      padding: 0.85rem 0.95rem;
+      border-left: 4px solid var(--green);
+      border-radius: 0 12px 12px 0;
+      background: var(--green-soft);
+    }
+    .demo-label, .trap-label, .fix-label {
+      display: block;
+      margin-bottom: 0.2rem;
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .demo-label { color: var(--green); }
+    .trap-label { color: var(--red); }
+    .fix-label { color: var(--blue); }
+    .sentence { font-family: Georgia, "Times New Roman", serif; font-size: 1.03rem; }
+    .mark-subject {
+      text-decoration-line: underline;
+      text-decoration-color: var(--blue);
+      text-decoration-thickness: 3px;
+      text-underline-offset: 3px;
+    }
+    .mark-verb {
+      padding: 0 0.15rem;
+      background: #ffe7a7;
+      border-radius: 4px;
+    }
+    .structure {
+      display: inline-block;
+      margin-top: 0.45rem;
+      color: var(--navy);
+      font: 750 0.84rem ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .answer-like {
+      margin-top: 0.65rem;
+      padding-top: 0.55rem;
+      border-top: 1px solid rgba(25, 116, 93, 0.22);
+      color: var(--navy);
+      font-size: 0.9rem;
+    }
+    .answer-like strong { color: var(--green); }
+    .reveal-cover {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-top: 0.72rem;
+      padding: 0.72rem 0.85rem;
+      color: var(--navy);
+      font-weight: 800;
+      text-align: left;
+      background: repeating-linear-gradient(135deg, #e8eef7 0 9px, #f5f8fc 9px 18px);
+      border: 1px solid #b9c8dc;
+      border-radius: 11px;
+      cursor: pointer;
+    }
+    .reveal-cover::after { content: "Reveal"; color: var(--blue); font-size: 0.76rem; letter-spacing: 0.06em; text-transform: uppercase; }
+    .reveal-cover[aria-expanded="true"]::after { content: "Hide"; }
+    .reveal-cover[aria-expanded="true"] { background: #e3edf9; }
+    .reveal-cover:hover, .reveal-cover:focus-visible { background: #e3edf9; outline: 3px solid rgba(45, 103, 178, 0.22); outline-offset: 2px; }
+    .reveal-panel {
+      margin-top: 0.72rem;
+      padding: 0.82rem 0.9rem;
+      border: 1px solid #c8d8eb;
+      border-radius: 11px;
+      background: #f7fbff;
+    }
+    .reveal-panel ul { margin: 0; padding-left: 1.15rem; }
+    .reveal-panel li + li { margin-top: 0.38rem; }
+    .teacher-mode .reveal-panel { background: #f4f8fd; }
+    .teacher-mode .teacher-visible-label {
+      display: block;
+      margin-bottom: 0.35rem;
+      color: var(--blue);
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .trap {
+      margin-top: 0.65rem;
+      padding: 0.72rem 0.85rem;
+      color: #6d2730;
+      background: var(--red-soft);
+      border-radius: 11px;
+    }
+    .note {
+      margin-top: 0.65rem;
+      padding: 0.72rem 0.85rem;
+      color: #654d15;
+      background: var(--gold-soft);
+      border-radius: 11px;
+    }
+
+    .table-wrap { margin-top: 1rem; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.94rem; }
+    th, td { padding: 0.85rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { color: var(--navy); background: var(--blue-soft); }
+    tr:last-child td { border-bottom: 0; }
+    .pattern { white-space: nowrap; color: var(--navy); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 750; }
+
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+    .method-step {
+      padding: 1rem;
+      border: 1px solid #cfdcf0;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #f7fbff, #edf5ff);
+    }
+    .method-step span {
+      display: inline-flex;
+      width: 1.9rem;
+      height: 1.9rem;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.55rem;
+      color: #fff;
+      background: var(--navy);
+      border-radius: 50%;
+      font-weight: 850;
+    }
+    .method-step h3 { margin: 0; color: var(--navy); font-size: 1rem; }
+    .method-step p { margin: 0.38rem 0 0; color: var(--muted); }
+
+    .worked-model {
+      margin-top: 1rem;
+      padding: 1.15rem;
+      color: #fff;
+      background: linear-gradient(135deg, #17375f, #245a90);
+      border-radius: 18px;
+    }
+    .worked-model h3 { margin: 0; color: #ffe5a9; }
+    .worked-model .sentence { display: block; margin: 0.7rem 0; font-size: 1.1rem; }
+    .worked-instruction { margin: 0.35rem 0 0; color: #dceaff; font-size: 0.9rem; }
+    .punctuation-slot {
+      display: inline-grid;
+      min-width: 1.8rem;
+      min-height: 1.55rem;
+      place-items: center;
+      margin: 0 0.12rem;
+      padding: 0 0.28rem;
+      vertical-align: 0.06em;
+      color: var(--navy);
+      background: #fff4c7;
+      border: 1px dashed #d59529;
+      border-radius: 6px;
+      cursor: pointer;
+      font: 800 1rem/1 Georgia, "Times New Roman", serif;
+    }
+    .punctuation-slot:hover, .punctuation-slot:focus-visible { background: #ffe7a7; outline: 3px solid rgba(255, 229, 169, 0.34); outline-offset: 2px; }
+    .punctuation-cover, .punctuation-mark { grid-area: 1 / 1; }
+    .punctuation-cover { color: #6d5120; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: -0.08em; }
+    .punctuation-mark { display: none; color: #9a2f3d; font-size: 1.25em; }
+    .punctuation-slot.revealed { background: #fffdf9; border-style: solid; }
+    .punctuation-slot.revealed .punctuation-cover { display: none; }
+    .punctuation-slot.revealed .punctuation-mark { display: inline; }
+    .punctuation-slot:disabled { opacity: 1; cursor: default; }
+    .worked-model .answer-like { color: var(--navy); }
+    .worked-model .reveal-panel { color: var(--ink); background: #f7fbff; }
+    .worked-model .reveal-panel .trace div { color: var(--ink); background: #fff; border: 1px solid #dbe5f1; }
+    .trace { display: grid; gap: 0.4rem; margin-top: 0.7rem; }
+    .trace div { padding: 0.55rem 0.7rem; background: rgba(255, 255, 255, 0.1); border-radius: 9px; }
+
+    .recall {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+    .recall .anki-card { padding: 0.95rem; border: 1px solid var(--line); border-radius: 14px; background: #f4f7fb; }
+    .recall strong { display: block; color: var(--navy); }
+    .anki-front { min-height: 4.8rem; }
+    .table-example { display: block; margin-top: 0.45rem; color: var(--green); font-family: Georgia, "Times New Roman", serif; }
+    .table-example.wrong { color: var(--red); }
+    .table-example b { font-family: Inter, ui-sans-serif, sans-serif; font-size: 0.74rem; letter-spacing: 0.05em; text-transform: uppercase; }
+    .footer { margin: 1.4rem 0 0; color: var(--muted); text-align: center; font-size: 0.86rem; }
+
+    @media (max-width: 760px) {
+      .page { width: calc(100% - 1rem); max-width: calc(100vw - 1rem); margin-top: 0.5rem; }
+      .hero { grid-template-columns: 1fr; border-radius: 20px; }
+      .knowledge-grid, .method-grid, .recall { grid-template-columns: 1fr; }
+      .knowledge-card.wide { grid-column: auto; }
+      .section { border-radius: 18px; }
+      .section-heading { align-items: start; }
+      .topbar { padding-inline: 0.75rem; }
+      .brand { font-size: 0.88rem; white-space: nowrap; }
+      .print-button { flex: 0 0 auto; padding-inline: 0.72rem; }
+      .print-full { display: none; }
+      .print-short { display: inline; }
+      h1 { font-size: clamp(1.9rem, 9.2vw, 2.35rem); overflow-wrap: anywhere; }
+      .hero-note, .subtitle { overflow-wrap: anywhere; }
+      .hero, .section, .toc { width: 100%; max-width: 100%; }
+    }
+
+    @media (max-width: 500px) {
+      .print-button { display: none; }
+    }
+
+    @media print {
+      @page { size: A4; margin: 12mm; }
+      body { background: #fff; font-size: 10.2pt; color: #111; }
+      .topbar, .toc { display: none !important; }
+      .page { width: 100%; margin: 0; }
+      .hero { color: #111; background: #edf3fa; box-shadow: none; border: 1px solid #b9c8dc; }
+      .hero .eyebrow, .subtitle { color: #243c60; }
+      .hero-note { border-color: #b9c8dc; background: #fff; }
+      .hero-note strong { color: #6c4d00; }
+      .section { box-shadow: none; break-inside: auto; }
+      .method-step, .worked-model, .demo, .trap, .note, .anki-card, tr { break-inside: avoid; }
+      .knowledge-card { break-inside: auto; }
+      .worked-model { color: #111; background: #edf3fa; border: 1px solid #b9c8dc; }
+      .worked-model h3 { color: #183865; }
+      .worked-instruction { color: #344968; }
+      .punctuation-slot { min-width: auto; min-height: auto; margin: 0; padding: 0; color: #111; background: transparent; border: 0; }
+      .punctuation-slot .punctuation-cover { display: none !important; }
+      .punctuation-slot .punctuation-mark { display: inline !important; color: #111; }
+      .worked-model .trace div { background: #fff; }
+      .reveal-cover { display: none !important; }
+      .reveal-panel[hidden] { display: block !important; }
+      .section, .hero, .knowledge-card, .demo, .trap, .note, .method-step, .worked-model, th {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="topbar" aria-label="Handout controls">
+    <span class="brand">Joy SAT · Review Library</span>
+    <button class="print-button" type="button" onclick="window.print()"><span class="print-full">Print full handout</span><span class="print-short">Print</span></button>
+  </nav>
+
+  <main class="page">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Standard English Conventions · Knowledge Review</p>
+        <h1>Sentence Boundaries</h1>
+        <p class="subtitle">Build the clause skeleton first. Then choose punctuation by structure—not by pause, length, or appearance.</p>
+      </div>
+      <aside class="hero-note">
+        <strong>Review-only reference</strong>
+        Every knowledge point includes a resolved demonstration and, when useful, its closest trap. This handout contains no exercises or unanswered items.
+      </aside>
+    </header>
+
+    <nav class="toc" aria-label="Handout sections">
+      <a href="#foundation">1 · Sentence foundation</a>
+      <a href="#connections">2 · Clause connections</a>
+      <a href="#modifiers">3 · Essential and extra information</a>
+      <a href="#marks">4 · Mark permissions</a>
+      <a href="#method">5 · SAT method</a>
+      <a href="#traps">6 · Trap library</a>
+      <a href="#recall">7 · Recall card</a>
+    </nav>
+
+    <section class="section" id="foundation">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Part 1</p>
+          <h2>Build the sentence foundation</h2>
+          <p>Punctuation decisions begin with subjects, finite verbs, and complete thoughts.</p>
+        </div>
+      </div>
+
+      <div class="knowledge-grid">
+        <article class="knowledge-card">
+          <span class="point-number">1</span>
+          <h3>A complete sentence needs a working skeleton</h3>
+          <p class="rule">An independent clause has a subject, a finite verb, and a complete thought. Objects and complements may be required to finish the meaning of the verb.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved demonstration</span>
+            <span class="sentence"><span class="mark-subject">The research team</span> <span class="mark-verb">confirmed</span> the result.</span>
+            <span class="structure">subject + finite verb + object = IC</span>
+          </div>
+          <div class="trap"><span class="trap-label">Closest trap</span><span class="sentence">The research team confirming the result.</span> The <em>-ing</em> form does not supply a finite main verb, so this is a fragment.</div>
+        </article>
+
+        <article class="knowledge-card">
+          <span class="point-number">2</span>
+          <h3>Finite verbs carry the clause</h3>
+          <p class="rule">A finite verb shows tense or works with a finite helping verb. An <em>-ing</em> form, a <em>to</em>-verb, or a past participle cannot carry a clause by itself.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved demonstration</span>
+            <span class="sentence">The data <span class="mark-verb">were</span> collected in May and <span class="mark-verb">revealed</span> a steady decline.</span>
+            <span class="structure">were = finite helper; collected = participle; revealed = second finite verb</span>
+          </div>
+          <div class="trap"><span class="trap-label">Closest trap</span><span class="sentence">The data collected in May.</span> Here, <em>collected</em> only describes <em>data</em>; no finite verb completes the sentence.</div>
+        </article>
+
+        <article class="knowledge-card">
+          <span class="point-number">3</span>
+          <h3>Independent clause, dependent clause, and phrase are different</h3>
+          <p class="rule">An independent clause can stand alone. A dependent clause has a subject and verb but begins with a dependency word. A phrase lacks a complete subject–finite-verb structure.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved demonstrations</span>
+            <div class="sentence"><strong>IC:</strong> The glacier retreated.</div>
+            <div class="sentence"><strong>DC:</strong> Because the glacier retreated</div>
+            <div class="sentence"><strong>Phrase:</strong> After the long winter</div>
+          </div>
+          <div class="note"><span class="fix-label">Dependency signals</span>Common signals include <em>although, because, if, since, when, while, unless, whereas, who, which,</em> and <em>that</em>.</div>
+        </article>
+
+        <article class="knowledge-card">
+          <span class="point-number">4</span>
+          <h3>Long subjects do not create new boundaries</h3>
+          <p class="rule">Prepositional phrases and modifiers inside a subject do not change the core subject–verb connection. Locate the head subject and its finite verb.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved demonstration</span>
+            <span class="sentence"><span class="mark-subject">The collection of nineteenth-century maps</span> <span class="mark-verb">belongs</span> to the university.</span>
+            <span class="structure">complete subject | finite verb; no punctuation</span>
+          </div>
+          <div class="trap"><span class="trap-label">Closest trap</span><span class="sentence">The collection of nineteenth-century maps, belongs to the university.</span> The comma illegally splits the subject from its verb.</div>
+        </article>
+
+        <article class="knowledge-card wide">
+          <span class="point-number">5</span>
+          <h3>One subject can control two verbs</h3>
+          <p class="rule">A compound predicate is still one clause. Do not treat the second verb as a new independent clause unless it has its own subject.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved comparison</span>
+            <div class="sentence"><strong>One clause:</strong> The team <span class="mark-verb">measured</span> the samples and <span class="mark-verb">recorded</span> the results.</div>
+            <div class="sentence"><strong>Two clauses:</strong> The team measured the samples, and the assistant recorded the results.</div>
+            <span class="structure">one subject + two verbs = no comma | two subjects + two finite verbs = comma + and</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="connections">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Part 2</p>
+          <h2>Connect clauses legally</h2>
+          <p>First classify both sides. Then use the small set of structures that Standard English permits.</p>
+        </div>
+      </div>
+
+      <div class="knowledge-grid">
+        <article class="knowledge-card wide">
+          <span class="point-number">6</span>
+          <h3>Two independent clauses need a strong join</h3>
+          <p class="rule"><strong>FANBOYS</strong> is the memory acronym for the seven coordinating conjunctions: <strong>for, and, nor, but, or, yet, so</strong>. When one of these words joins two independent clauses, use a comma before it. A period or semicolon can also make the boundary legal.</p>
+          <div class="demo">
+            <span class="demo-label">Three legal versions</span>
+            <div class="sentence">The first trial failed. The team revised the method.</div>
+            <div class="sentence">The first trial failed; the team revised the method.</div>
+            <div class="sentence">The first trial failed, so the team revised the method.</div>
+            <span class="structure">IC . IC | IC ; IC | IC , FANBOYS IC</span>
+          </div>
+          <div class="trap"><span class="trap-label">Illegal versions</span><span class="sentence">The first trial failed, the team revised the method.</span> is a comma splice. <span class="sentence">The first trial failed the team revised the method.</span> is a fused sentence.</div>
+        </article>
+
+        <article class="knowledge-card">
+          <span class="point-number">7</span>
+          <h3>A conjunctive adverb is not FANBOYS</h3>
+          <p class="rule">Words such as <em>however, therefore, moreover, nevertheless, consequently,</em> and <em>instead</em> cannot join independent clauses with commas alone.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved demonstration</span>
+            <span class="sentence">The first trial failed; however, the team revised the method.</span>
+            <span class="structure">IC ; transition, IC</span>
+          </div>
+          <div class="note"><span class="fix-label">Also legal</span><span class="sentence">The first trial failed. However, the team revised the method.</span></div>
+          <div class="trap"><span class="trap-label">Closest trap</span><span class="sentence">The first trial failed, however, the team revised the method.</span> still contains a comma splice.</div>
+        </article>
+
+        <article class="knowledge-card">
+          <span class="point-number">8</span>
+          <h3>An initial dependent unit attaches with a comma</h3>
+          <p class="rule">When a dependent clause or introductory phrase comes before the main clause, place a comma at the end of that opening unit.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved demonstrations</span>
+            <div class="sentence">Although the first trial failed, the team revised the method.</div>
+            <div class="sentence">After reviewing the data, the team revised the method.</div>
+            <span class="structure">DC, IC | introductory phrase, IC</span>
+          </div>
+          <div class="trap"><span class="trap-label">Closest trap</span>A period or semicolon after the initial dependent clause would leave a fragment.</div>
+        </article>
+
+        <article class="knowledge-card wide">
+          <span class="point-number">9</span>
+          <h3>An essential final dependent clause usually stays attached</h3>
+          <p class="rule">A dependent clause that follows and completes the main idea normally takes no comma when it states an essential reason, condition, time, or identity.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved comparison</span>
+            <div class="sentence"><strong>Essential reason:</strong> The team repeated the trial because the sensor had failed.</div>
+            <div class="sentence"><strong>Added contrast:</strong> The team repeated the trial, although the initial result remained plausible.</div>
+          </div>
+          <div class="note"><span class="fix-label">Meaning controls punctuation</span>The first final clause is required to explain why the trial was repeated. The second adds a contrasting comment and may be set off.</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="modifiers">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Part 3</p>
+          <h2>Separate identifying information from extra information</h2>
+          <p>Length does not decide. Meaning and sentence structure decide.</p>
+        </div>
+      </div>
+
+      <div class="knowledge-grid">
+        <article class="knowledge-card wide">
+          <span class="point-number">10</span>
+          <h3>Specifying information identifies; extra information comments</h3>
+          <p class="rule">Specifying information is needed to identify the noun and receives no surrounding punctuation. Extra information can be removed without changing the intended reference and receives punctuation.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved comparison</span>
+            <div class="sentence"><strong>Specifying:</strong> The sensor that failed during launch was replaced.</div>
+            <div class="sentence"><strong>Extra:</strong> The primary sensor, which failed during launch, was replaced.</div>
+            <span class="structure">needed identity = no pair | removable comment = matched pair</span>
+          </div>
+          <div class="note"><span class="fix-label">Useful language cue</span><em>That</em> commonly begins specifying information. <em>Which</em> commonly begins extra information and therefore appears with punctuation.</div>
+        </article>
+
+        <article class="knowledge-card">
+          <span class="point-number">11</span>
+          <h3>Extra information needs matched boundaries</h3>
+          <p class="rule">Commas, dashes, or parentheses may enclose a removable interruption. Use one matching system around the whole unit.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved demonstrations</span>
+            <div class="sentence">Maya Chen, the project director, presented the findings.</div>
+            <div class="sentence">Maya Chen—the project director—presented the findings.</div>
+            <div class="sentence">Maya Chen (the project director) presented the findings.</div>
+          </div>
+          <div class="trap"><span class="trap-label">Closest trap</span><span class="sentence">Maya Chen, the project director—presented the findings.</span> mixes boundary systems and leaves the interruption unmatched.</div>
+        </article>
+
+        <article class="knowledge-card">
+          <span class="point-number">12</span>
+          <h3>Names and titles follow the same meaning test</h3>
+          <p class="rule">A name is not automatically surrounded by commas. Decide whether it identifies the person or merely renames someone already identified.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved comparison</span>
+            <div class="sentence"><strong>Name identifies:</strong> Biologist Rachel Carson published the book.</div>
+            <div class="sentence"><strong>Name already identified:</strong> Rachel Carson, a marine biologist, published the book.</div>
+          </div>
+          <div class="trap"><span class="trap-label">Closest trap</span>Punctuating every title or name as extra information without testing whether the noun remains specifically identified.</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="marks">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Part 4</p>
+          <h2>Know each mark's permission and limit</h2>
+          <p>A punctuation mark is correct only when the structure licenses its exact job.</p>
+        </div>
+      </div>
+
+      <div class="knowledge-grid">
+        <article class="knowledge-card wide">
+          <span class="point-number">13</span>
+          <h3>Comma permissions are limited</h3>
+          <p class="rule">On SAT Boundaries items, commas most often mark an introductory unit, separate simple list items, enclose extra information, or appear before FANBOYS joining two independent clauses.</p>
+          <div class="demo">
+            <span class="demo-label">Four resolved jobs</span>
+            <div class="sentence"><strong>Introductory unit:</strong> After sunset, the temperature fell.</div>
+            <div class="sentence"><strong>List:</strong> The kit contained water, food, and a flashlight.</div>
+            <div class="sentence"><strong>Extra information:</strong> The sample, collected in May, remained stable.</div>
+            <div class="sentence"><strong>IC join:</strong> The temperature fell, so the lake froze.</div>
+          </div>
+          <div class="trap"><span class="trap-label">Never use pause alone</span>A spoken pause does not prove a comma. Clause status and grammatical function control the mark.</div>
+        </article>
+
+        <article class="knowledge-card">
+          <span class="point-number">14</span>
+          <h3>A colon or single dash needs a complete lead-in</h3>
+          <p class="rule">A colon or single dash may introduce an explanation, example, restatement, or list only after a complete clause.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved demonstration</span>
+            <span class="sentence">The delay had one cause: a damaged cable.</span>
+            <span class="structure">complete lead-in : explanation</span>
+          </div>
+          <div class="note"><span class="fix-label">Equivalent emphasis</span><span class="sentence">The delay had one cause—a damaged cable.</span> A single dash can perform the same completion job with stronger emphasis.</div>
+          <div class="trap"><span class="trap-label">Closest trap</span><span class="sentence">The cause was: a damaged cable.</span> The colon illegally separates the linking verb from its complement.</div>
+        </article>
+
+        <article class="knowledge-card">
+          <span class="point-number">15</span>
+          <h3>Lists require visible item boundaries</h3>
+          <p class="rule">Use commas between simple parallel items. Use semicolons between complex items that already contain commas. A colon introduces a list only after a complete lead-in.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved demonstrations</span>
+            <div class="sentence"><strong>Simple:</strong> We packed maps, water, and food.</div>
+            <div class="sentence"><strong>Complex:</strong> The speakers were Ana Cruz, a chemist; David Li, an engineer; and Mina Shah, a physician.</div>
+          </div>
+          <div class="note"><span class="fix-label">Parallel-item check</span>Each list item must perform the same grammatical job. Punctuation cannot repair a list whose items are not parallel.</div>
+        </article>
+
+        <article class="knowledge-card wide">
+          <span class="point-number">16</span>
+          <h3>No punctuation is a structural choice</h3>
+          <p class="rule">Do not split a required grammatical unit. A blank or answer choice does not prove that a mark belongs there.</p>
+          <div class="demo">
+            <span class="demo-label">Resolved no-mark units</span>
+            <div class="sentence"><strong>Subject–verb:</strong> The final decision surprised the audience.</div>
+            <div class="sentence"><strong>Verb–object:</strong> The committee approved the proposal.</div>
+            <div class="sentence"><strong>Preposition–object:</strong> The pages from the archive were restored.</div>
+            <div class="sentence"><strong>Adjective–noun:</strong> The newly restored manuscript is on display.</div>
+            <div class="sentence"><strong>Compound predicate:</strong> The team collected the samples and analyzed them.</div>
+            <div class="sentence"><strong>Specifying modifier:</strong> The manuscript that contains the map is on display.</div>
+          </div>
+        </article>
+      </div>
+
+      <div class="table-wrap" aria-label="Punctuation permission map">
+        <table>
+          <thead>
+            <tr><th>Mark</th><th>Main SAT permission</th><th>Resolved pattern</th><th>Common illegal use</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Period</td><td>Ends one independent clause before another sentence<span class="table-example"><b>Legal:</b> The trial ended. The team left.</span></td><td class="pattern">IC. IC</td><td>Leaves a dependent clause as a fragment<span class="table-example wrong"><b>Illegal:</b> Because the trial ended. The team left.</span></td></tr>
+            <tr><td>Semicolon</td><td>Joins related independent clauses; separates complex list items<span class="table-example"><b>Legal:</b> The trial ended; the team left.</span></td><td class="pattern">IC; IC</td><td>Joins an IC to a phrase or DC<span class="table-example wrong"><b>Illegal:</b> The team left; after the trial.</span></td></tr>
+            <tr><td>Comma + FANBOYS</td><td>Joins two independent clauses<span class="table-example"><b>Legal:</b> The trial ended, so the team left.</span></td><td class="pattern">IC, but IC</td><td>Comma alone or conjunction without the required comma<span class="table-example wrong"><b>Illegal:</b> The trial ended, the team left.</span></td></tr>
+            <tr><td>Comma</td><td>Marks an introductory unit, simple list, or removable extra information<span class="table-example"><b>Legal:</b> After the trial, the team left.</span></td><td class="pattern">DC, IC</td><td>Creates a comma splice or splits a required unit<span class="table-example wrong"><b>Illegal:</b> The research team, left.</span></td></tr>
+            <tr><td>Colon</td><td>Introduces completion after a complete lead-in<span class="table-example"><b>Legal:</b> The delay had one cause: ice.</span></td><td class="pattern">IC: explanation</td><td>Appears after an unfinished verb or preposition<span class="table-example wrong"><b>Illegal:</b> The cause was: ice.</span></td></tr>
+            <tr><td>Single dash</td><td>Introduces emphatic completion after a complete lead-in<span class="table-example"><b>Legal:</b> One result was clear—the plan worked.</span></td><td class="pattern">IC—explanation</td><td>Appears after an incomplete lead-in<span class="table-example wrong"><b>Illegal:</b> The plan required—more time.</span></td></tr>
+            <tr><td>Paired commas, dashes, or parentheses</td><td>Enclose removable extra information<span class="table-example"><b>Legal:</b> The sample, collected in May, remained stable.</span></td><td class="pattern">core, extra, core</td><td>Uses a mixed or one-sided pair<span class="table-example wrong"><b>Illegal:</b> The sample, collected in May—remained stable.</span></td></tr>
+            <tr><td>No punctuation</td><td>Preserves one required grammatical unit<span class="table-example"><b>Legal:</b> The pages from the archive survived.</span></td><td class="pattern">subject + verb</td><td>Adds a mark merely because the unit is long<span class="table-example wrong"><b>Illegal:</b> The pages from the archive, survived.</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="method">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Part 5</p>
+          <h2>Clause-Skeleton Punctuation</h2>
+          <p>Use one stable method for every Sentence Boundaries item.</p>
+        </div>
+      </div>
+
+      <div class="method-grid">
+        <article class="method-step"><span>1</span><h3>Read the whole sentence</h3><p>Meaning helps reveal where one grammatical unit ends and another begins.</p></article>
+        <article class="method-step"><span>2</span><h3>Mark subjects and finite verbs</h3><p>Ignore descriptive phrases until the core skeleton is visible.</p></article>
+        <article class="method-step"><span>3</span><h3>Classify both sides</h3><p>Label each side IC, DC, phrase, extra information, list item, or required unit.</p></article>
+        <article class="method-step"><span>4</span><h3>Name the boundary job</h3><p>State the exact job: join, attach, enclose, introduce, separate, or preserve.</p></article>
+        <article class="method-step"><span>5</span><h3>Choose a licensed pattern</h3><p>Match the structure to the boundary map. Do not choose by sound or visual balance.</p></article>
+        <article class="method-step"><span>6</span><h3>Audit the full sentence</h3><p>Check for a fragment, comma splice, fused sentence, unmatched pair, or split unit.</p></article>
+      </div>
+
+      <div class="worked-model">
+        <h3>Full-method demonstration · solve the boundaries first</h3>
+        <p class="worked-instruction">Say each boundary mark before clicking its covered slot. Click the same slot again to hide it.</p>
+        <span class="sentence">Because the archive had been damaged<button class="punctuation-slot" type="button" aria-pressed="false" aria-label="Reveal boundary punctuation"><span class="punctuation-cover" aria-hidden="true">___</span><span class="punctuation-mark" aria-hidden="true">,</span></button> the conservators photographed each page<button class="punctuation-slot" type="button" aria-pressed="false" aria-label="Reveal boundary punctuation"><span class="punctuation-cover" aria-hidden="true">___</span><span class="punctuation-mark" aria-hidden="true">;</span></button> however<button class="punctuation-slot" type="button" aria-pressed="false" aria-label="Reveal boundary punctuation"><span class="punctuation-cover" aria-hidden="true">___</span><span class="punctuation-mark" aria-hidden="true">,</span></button> they postponed restoration.</span>
+        <div class="trace">
+          <div><strong>Skeleton:</strong> <em>Because the archive had been damaged</em> = DC. <em>The conservators photographed each page</em> = IC. <em>They postponed restoration</em> = IC.</div>
+          <div><strong>First boundary:</strong> Initial DC attaches to the first IC with a comma.</div>
+          <div><strong>Second boundary:</strong> Two ICs are linked by <em>however</em>, so the legal pattern is semicolon + transition + comma.</div>
+          <div><strong>Audit:</strong> No fragment, comma splice, fused sentence, unmatched interruption, or split required unit remains.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="traps">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Part 6</p>
+          <h2>High-frequency trap library</h2>
+          <p>Each trap corrupts one field in the method.</p>
+        </div>
+      </div>
+
+      <div class="knowledge-grid">
+        <article class="knowledge-card"><h3>Pause trap</h3><p>Sound replaces structure.</p><div class="demo"><span class="demo-label">Repair</span><span class="sentence">The unusually long migration route crosses the desert.</span> Long subject, no subject–verb comma.</div></article>
+        <article class="knowledge-card"><h3>False-verb trap</h3><p>An <em>-ing</em>, <em>to</em>-verb, or participle is mistaken for a finite verb.</p><div class="demo"><span class="demo-label">Repair</span><span class="sentence">The researchers examining the sample noticed a crack.</span> <em>Noticed</em> carries the clause.</div></article>
+        <article class="knowledge-card"><h3>Comma-splice trap</h3><p>A comma alone is used between two independent clauses.</p><div class="demo"><span class="demo-label">Repair</span><span class="sentence">The sample was stable; the team continued the test.</span></div></article>
+        <article class="knowledge-card"><h3>Conjunction-only trap</h3><p>FANBOYS appears between two ICs without its comma.</p><div class="demo"><span class="demo-label">Repair</span><span class="sentence">The sample was stable, and the team continued the test.</span></div></article>
+        <article class="knowledge-card"><h3>Semicolon-fragment trap</h3><p>A semicolon is placed before a DC or phrase.</p><div class="demo"><span class="demo-label">Repair</span><span class="sentence">The team continued the test because the sample was stable.</span> No semicolon before the essential reason clause.</div></article>
+        <article class="knowledge-card"><h3>Colon-by-list trap</h3><p>A list is noticed, but the lead-in is unfinished.</p><div class="demo"><span class="demo-label">Repair</span><span class="sentence">The kit contained water, food, and a flashlight.</span> No colon after the verb <em>contained</em>.</div></article>
+        <article class="knowledge-card"><h3>One-sided-pair trap</h3><p>Only one side of extra information is marked.</p><div class="demo"><span class="demo-label">Repair</span><span class="sentence">The sample, collected in May, remained stable.</span></div></article>
+        <article class="knowledge-card"><h3>Overpunctuation trap</h3><p>A mark splits one required unit.</p><div class="demo"><span class="demo-label">Repair</span><span class="sentence">The pages from the archive were restored.</span> Keep the preposition with its object.</div></article>
+        <article class="knowledge-card"><h3>False-new-clause trap</h3><p>A second verb under the same subject is treated as a new IC.</p><div class="demo"><span class="demo-label">Repair</span><span class="sentence">The team photographed the pages and postponed restoration.</span></div></article>
+        <article class="knowledge-card"><h3>List-edge trap</h3><p>An internal comma is mistaken for the end of a complex list item.</p><div class="demo"><span class="demo-label">Repair</span><span class="sentence">The panel included Ana Cruz, a chemist; David Li, an engineer; and Mina Shah, a physician.</span></div></article>
+      </div>
+    </section>
+
+    <section class="section" id="recall">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Part 7</p>
+          <h2>One-page recall card</h2>
+          <p>No new content—only the complete decision system in compact form.</p>
+        </div>
+      </div>
+      <div class="recall">
+        <div><strong>Skeleton</strong>Find subjects and finite verbs. Treat modifiers as removable until the core is visible.</div>
+        <div><strong>Status</strong>Classify each side as IC, DC, phrase, extra information, list item, or required unit.</div>
+        <div><strong>Two ICs</strong>Use period, semicolon, or comma + FANBOYS. Never comma alone.</div>
+        <div><strong>Transition between ICs</strong>Use <em>IC; however, IC</em> or start a new sentence.</div>
+        <div><strong>Dependent opening</strong>Use <em>DC, IC</em>. Keep an essential final DC attached.</div>
+        <div><strong>Extra information</strong>Remove it, verify the same reference remains, then use a matched pair.</div>
+        <div><strong>Colon or single dash</strong>Require a complete lead-in before an explanation, example, restatement, or list.</div>
+        <div><strong>Lists</strong>Bracket full parallel items. Use commas for simple items and semicolons for complex items.</div>
+        <div><strong>No punctuation</strong>Preserve subject–verb, verb–object, preposition–object, adjective–noun, compound predicates, and specifying modifiers.</div>
+        <div><strong>Final audit</strong>Reject fragments, comma splices, fused sentences, unmatched pairs, and split required units.</div>
+      </div>
+      <p class="footer">Keep this page as a reusable Sentence Boundaries reference for later review.</p>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const teacherMode = new URLSearchParams(window.location.search).get("view") === "teacher";
+      const body = document.body;
+      let revealCount = 0;
+
+      if (teacherMode) {
+        body.classList.add("teacher-mode");
+        document.title = "Sentence Boundaries · Teacher Knowledge Review";
+        document.querySelector(".brand").textContent = "Joy SAT · Teacher Review Library";
+        document.querySelector(".hero-note").innerHTML = "<strong>Teacher edition</strong>Student-visible sentences remain in the same order. Explanations, trap diagnoses, and repairs are expanded for instruction.";
+        document.querySelector(".worked-model h3").textContent = "Resolved full-method demonstration";
+        document.querySelector(".worked-instruction").textContent = "Boundary punctuation is shown in the Teacher version; the full method trace remains expanded below.";
+      }
+
+      document.querySelectorAll(".punctuation-slot").forEach(slot => {
+        if (teacherMode) {
+          slot.classList.add("revealed");
+          slot.setAttribute("aria-pressed", "true");
+          slot.setAttribute("aria-label", "Boundary punctuation shown");
+          slot.disabled = true;
+          return;
+        }
+        slot.addEventListener("click", () => {
+          const willReveal = !slot.classList.contains("revealed");
+          slot.classList.toggle("revealed", willReveal);
+          slot.setAttribute("aria-pressed", String(willReveal));
+          slot.setAttribute("aria-label", willReveal ? "Hide boundary punctuation" : "Reveal boundary punctuation");
+        });
+      });
+
+      function addReveal(host, label, content) {
+        const id = `reveal-${++revealCount}`;
+        const panel = document.createElement("div");
+        panel.className = "reveal-panel";
+        panel.id = id;
+        panel.innerHTML = content;
+
+        if (teacherMode) {
+          const visibleLabel = document.createElement("span");
+          visibleLabel.className = "teacher-visible-label";
+          visibleLabel.textContent = label.replace(/^Reveal /, "");
+          panel.prepend(visibleLabel);
+          host.append(panel);
+          return;
+        }
+
+        panel.hidden = true;
+        const cover = document.createElement("button");
+        cover.type = "button";
+        cover.className = "reveal-cover";
+        cover.setAttribute("aria-expanded", "false");
+        cover.setAttribute("aria-controls", id);
+        cover.textContent = label;
+        const hideLabel = label.replace(/^Reveal\b/, "Hide");
+
+        cover.addEventListener("click", () => {
+          const willOpen = panel.hidden;
+          panel.hidden = !willOpen;
+          cover.setAttribute("aria-expanded", String(willOpen));
+          cover.textContent = willOpen ? hideLabel : label;
+        });
+        host.append(cover, panel);
+      }
+
+      const conceptData = {
+        1: ["subject + finite verb + object", "The subject names the doer; <em>confirmed</em> is the tense-bearing verb; <em>the result</em> completes the verb's meaning."],
+        2: ["were collected ... and revealed", "<em>Were</em> is the finite helper, <em>collected</em> is a participle, and <em>revealed</em> is the second finite verb controlled by <em>the data</em>."],
+        3: ["IC | DC | phrase", "The independent clause can stand alone. <em>Because</em> makes the second unit dependent. The final unit has no subject–finite-verb pair."],
+        4: ["complete subject + finite verb; no mark", "The head subject is <em>collection</em>; <em>of nineteenth-century maps</em> only modifies it. A comma cannot split that subject from <em>belongs</em>."],
+        5: ["one subject + two verbs = no comma", "In a compound predicate, both verbs share one subject. A comma before <em>and</em> is licensed only when the words after <em>and</em> form another independent clause."],
+        6: ["IC. IC | IC; IC | IC, FANBOYS IC", "FANBOYS means <em>for, and, nor, but, or, yet, so</em>. Each legal pattern supplies a complete boundary between two independent clauses."],
+        7: ["IC; however, IC", "A conjunctive adverb is a transition, not a coordinating conjunction. The semicolon closes the first independent clause; the comma follows the transition."],
+        8: ["DC, IC | introductory phrase, IC", "The opening unit cannot stand alone, so the comma attaches it to the independent clause that follows."],
+        9: ["IC because DC | IC, although DC", "An essential reason clause stays attached without a comma. A final clause that adds a nonessential contrast may be set off."],
+        10: ["specifying = no pair | extra = matched pair", "Remove the modifier and test identity. If the intended sensor is still uniquely identified, the modifier is extra and takes a matched pair."],
+        11: ["core, extra, core | core—extra—core", "The removable interruption must have two matching edges. Commas, paired dashes, and parentheses are alternatives, not pieces to mix."],
+        12: ["identifying name = no pair | renaming phrase = matched pair", "<em>Rachel Carson</em> is needed after the general title <em>biologist</em>. In the second sentence, the full name already identifies the person, so the occupational phrase is extra."],
+        13: ["intro, core | item, item, and item | core, extra, core | IC, FANBOYS IC", "A comma must perform a named grammatical job. A pause or a long group of words is not a permission."],
+        14: ["complete IC: completion | complete IC—completion", "Read only the words before the mark. If they can stand as a complete sentence, a colon or single dash may introduce the promised completion."],
+        15: ["simple items: commas | complex items: semicolons", "Bracket each complete item before choosing separators. Internal commas make semicolons useful at the item boundaries."],
+        16: ["one required unit = no punctuation", "Subject–verb, verb–object, preposition–object, adjective–noun, compound-predicate, and specifying-modifier connections must stay intact."]
+      };
+
+      const closestTraps = {
+        1: ["The research team confirming the result.", "The <em>-ing</em> form is mistaken for the finite main verb.", "The research team <strong>confirmed</strong> the result.", "Require a subject, a finite verb, and a complete thought."],
+        2: ["The data collected in May.", "<em>Collected</em> only modifies <em>data</em>; no finite verb completes the sentence.", "The data <strong>were collected</strong> in May.", "A participle cannot carry a clause by itself."],
+        4: ["The collection of nineteenth-century maps, belongs to the university.", "The comma splits the full subject from its finite verb.", "The collection of nineteenth-century maps <strong>belongs</strong> to the university.", "Never separate a subject from its verb because the subject is long."],
+        6: ["The first trial failed, the team revised the method.<br>The first trial failed the team revised the method.", "The first is a comma splice; the second is a fused sentence.", "The first trial failed; the team revised the method.", "Two independent clauses need a period, semicolon, or comma + FANBOYS."],
+        7: ["The first trial failed, however, the team revised the method.", "Commas around <em>however</em> do not create a legal boundary between independent clauses.", "The first trial failed; however, the team revised the method.", "A conjunctive adverb cannot do FANBOYS's job."],
+        8: ["Although the first trial failed. The team revised the method.", "The period strands an initial dependent clause as a fragment.", "Although the first trial failed, the team revised the method.", "Attach an initial dependent unit to its independent clause with a comma."],
+        11: ["Maya Chen, the project director—presented the findings.", "The interruption opens with a comma and closes with a dash.", "Maya Chen, the project director, presented the findings.", "Use one matching boundary system around extra information."],
+        12: ["Biologist, Rachel Carson, published the book.", "The commas wrongly treat the identifying name as removable.", "Biologist Rachel Carson published the book.", "Test whether the name identifies or merely renames."],
+        13: ["The unusually long migration route, crosses the desert.", "The comma is based on a pause and splits the subject from its verb.", "The unusually long migration route crosses the desert.", "Name the comma's grammatical job; if none exists, omit it."],
+        14: ["The cause was: a damaged cable.", "The colon separates the linking verb from its required complement.", "The delay had one cause: a damaged cable.", "A colon or single dash needs a complete lead-in."],
+        15: ["The speakers were Ana Cruz, a chemist, David Li, an engineer, and Mina Shah, a physician.", "Commas cannot clearly separate complex list items that already contain commas.", "The speakers were Ana Cruz, a chemist; David Li, an engineer; and Mina Shah, a physician.", "Bracket full items, then use semicolons at the outer boundaries."],
+        16: ["The pages from the archive, were restored.", "The comma splits the complete subject from its finite verb.", "The pages from the archive were restored.", "Choose no punctuation when a required grammatical unit crosses the boundary."]
+      };
+
+      document.querySelectorAll(".knowledge-card .point-number").forEach(number => {
+        const point = Number(number.textContent.trim());
+        const card = number.closest(".knowledge-card");
+        const demo = card.querySelector(":scope > .demo");
+        const data = conceptData[point];
+        if (demo && data) {
+          const label = demo.querySelector(".demo-label");
+          if (label) label.textContent = demo.querySelectorAll(".sentence").length > 1 ? "SAT-style sentences" : "SAT-style sentence";
+          demo.querySelectorAll(":scope > .structure").forEach(node => node.remove());
+          const answer = document.createElement("div");
+          answer.className = "answer-like";
+          answer.innerHTML = `<strong>Answer-like form:</strong> ${data[0]}`;
+          demo.append(answer);
+          addReveal(demo, "Reveal sentence explanation", `<ul><li>${data[1]}</li></ul>`);
+        }
+
+        const trap = card.querySelector(":scope > .trap");
+        const trapData = closestTraps[point];
+        if (trap && trapData) {
+          trap.innerHTML = `<span class="trap-label">Closest trap · mistake</span><div class="sentence">${trapData[0]}</div>`;
+          addReveal(trap, "Reveal failure and repair", `<ul><li><strong>Failure:</strong> ${trapData[1]}</li><li><strong>Repair:</strong> <span class="sentence">${trapData[2]}</span></li><li><strong>Portable rule:</strong> ${trapData[3]}</li></ul>`);
+        }
+
+        card.querySelectorAll(":scope > .note").forEach(note => {
+          if (teacherMode) return;
+          const holder = document.createElement("div");
+          const detail = note.innerHTML;
+          note.replaceWith(holder);
+          addReveal(holder, "Reveal extra note", detail);
+        });
+      });
+
+      const workedModel = document.querySelector(".worked-model");
+      const trace = workedModel.querySelector(".trace");
+      const traceContent = trace.outerHTML;
+      trace.remove();
+      const modelAnswer = document.createElement("div");
+      modelAnswer.className = "answer-like";
+      modelAnswer.innerHTML = "<strong>Answer-like form:</strong> DC, IC; however, IC";
+      addReveal(workedModel, "Reveal full method trace", modelAnswer.outerHTML + traceContent);
+
+      const trapLibrary = {
+        "Pause trap": ["The unusually long migration route, crosses the desert.", "Sound replaces structure; the comma splits subject from verb.", "The unusually long migration route crosses the desert.", "Locate the subject and finite verb before listening for a pause."],
+        "False-verb trap": ["The researchers examining the sample.", "<em>Examining</em> is a participle, not the finite main verb.", "The researchers examining the sample noticed a crack.", "Confirm that every independent clause has a finite verb."],
+        "Comma-splice trap": ["The sample was stable, the team continued the test.", "A comma alone cannot join two independent clauses.", "The sample was stable; the team continued the test.", "Use a strong IC-to-IC boundary."],
+        "Conjunction-only trap": ["The sample was stable and the team continued the test.", "FANBOYS joins two independent clauses here but lacks its required comma.", "The sample was stable, and the team continued the test.", "For two ICs, use comma + FANBOYS."],
+        "Semicolon-fragment trap": ["The team continued the test; because the sample was stable.", "The words after the semicolon form a dependent clause, not an IC.", "The team continued the test because the sample was stable.", "A semicolon needs an independent clause on each side."],
+        "Colon-by-list trap": ["The kit contained: water, food, and a flashlight.", "The lead-in stops at a transitive verb and is not complete.", "The kit contained water, food, and a flashlight.", "A visible list does not override the complete-lead-in test."],
+        "One-sided-pair trap": ["The sample, collected in May remained stable.", "The removable interruption has an opening comma but no closing comma.", "The sample, collected in May, remained stable.", "Extra information needs two matching boundaries."],
+        "Overpunctuation trap": ["The pages from, the archive were restored.", "The comma splits a preposition from its object.", "The pages from the archive were restored.", "Preserve required grammatical units."],
+        "False-new-clause trap": ["The team photographed the pages, and postponed restoration.", "The second verb shares the subject <em>team</em>; it is not a new IC.", "The team photographed the pages and postponed restoration.", "A compound predicate normally takes no comma."],
+        "List-edge trap": ["The panel included Ana Cruz, a chemist, David Li, an engineer, and Mina Shah, a physician.", "Internal commas blur the outer boundaries between the three people.", "The panel included Ana Cruz, a chemist; David Li, an engineer; and Mina Shah, a physician.", "Use semicolons between complex list items."]
+      };
+
+      document.querySelectorAll("#traps .knowledge-card").forEach(card => {
+        const title = card.querySelector("h3").textContent.trim();
+        const data = trapLibrary[title];
+        if (!data) return;
+        card.innerHTML = `<h3>${title}</h3><div class="trap"><span class="trap-label">Mistake</span><div class="sentence">${data[0]}</div></div>`;
+        addReveal(card, "Reveal why and repair", `<ul><li><strong>Failed field:</strong> ${data[1]}</li><li><strong>Repair:</strong> <span class="sentence">${data[2]}</span></li><li><strong>Portable rule:</strong> ${data[3]}</li></ul>`);
+      });
+
+      const recallExamples = [
+        ["The team reviewing the images found a pattern.", "team = subject; found = finite verb"],
+        ["Although the lake froze, the fish survived.", "DC, IC"],
+        ["The lake froze; the boats remained ashore.", "IC; IC"],
+        ["The lake froze; therefore, the boats remained ashore.", "IC; transition, IC"],
+        ["Because the sensor failed, the team repeated the trial.", "DC, IC"],
+        ["The sensor, installed in May, failed during launch.", "core, extra, core"],
+        ["The delay had one cause: ice.", "complete IC: completion"],
+        ["The panel included Cruz, a chemist; Li, an engineer; and Shah, a physician.", "complex item; complex item; complex item"],
+        ["The pages from the archive survived.", "subject + modifier + verb; no mark"],
+        ["The trial ended, so the team left.", "No fragment, splice, fused sentence, unmatched pair, or split unit"]
+      ];
+
+      document.querySelectorAll(".recall > div").forEach((card, index) => {
+        const original = card.innerHTML;
+        const example = recallExamples[index];
+        card.className = "anki-card";
+        card.innerHTML = `<div class="anki-front">${original}</div>`;
+        addReveal(card, "Reveal SAT-style example", `<div class="sentence">${example[0]}</div><div class="answer-like"><strong>Answer-like form:</strong> ${example[1]}</div>`);
+      });
+    })();
+  </script>
+</body>
+</html>
