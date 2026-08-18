@@ -26,7 +26,7 @@
   });
   if (resourceId && endpoint) {
     loadLearningResource();
-    window.setInterval(loadLearningResource, 15000);
+    window.setInterval(loadLearningResource, 30000);
   }
 
   function loadLearningResource() {
@@ -96,14 +96,19 @@
     parameters.accessToken = portalAccessToken();
     var callbackName = '__joyResource' + Date.now() + Math.random().toString(16).slice(2);
     var script = document.createElement('script');
-    var timeout = window.setTimeout(cleanup, 9000);
-    function cleanup() {
+    var timeout = window.setTimeout(function () { cleanup(true); }, 30000);
+    function cleanup(timedOut) {
       window.clearTimeout(timeout);
-      delete window[callbackName];
+      if (timedOut) {
+        window[callbackName] = function () {};
+        window.setTimeout(function () { delete window[callbackName]; }, 60000);
+      } else {
+        delete window[callbackName];
+      }
       if (script.parentNode) script.parentNode.removeChild(script);
     }
-    window[callbackName] = function (data) { cleanup(); success(data); };
-    script.onerror = cleanup;
+    window[callbackName] = function (data) { cleanup(false); success(data); };
+    script.onerror = function () { cleanup(false); };
     var query = Object.keys(parameters).map(function (key) {
       return encodeURIComponent(key) + '=' + encodeURIComponent(parameters[key]);
     });
