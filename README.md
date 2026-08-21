@@ -1,5 +1,7 @@
 # Joy SAT Homework Portal
 
+- `final-review/` is the 2026-08-21 exam-eve review hub. It prioritizes the existing Opening Structures and Sentence Boundaries handouts and the assigned Transitions Practice 4, then offers three newly authored, non-overlapping six-question diagnostics for Opening Structures, Poetry, and Quantitative Data. The three new sets are published optional, not required; private checking and explanations are enabled after submission.
+
 Interactive, mobile-friendly homework pages for Joy's SAT Reading and Writing programme.
 
 Role boundary: **Joy is the student** and **Teacher** is the generic private staff role. Mock Exam 2 uses the normal URL for Joy's real work and `?test=1` for the isolated Teacher testing copy.
