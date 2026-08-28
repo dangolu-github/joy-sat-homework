@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <title>0822 Exam Review · Joy SAT</title>
   <link rel="stylesheet" href="../assets/hub.css">
-  <link rel="stylesheet" href="../assets/exam-review.css">
+  <link rel="stylesheet" href="../assets/exam-review.css?v=20260828b">
 </head>
 <body>
   <div class="workspace-shell">
@@ -21,7 +21,7 @@
         <a class="tree-link" href="../final-review/"><span class="tree-date">Aug 21</span><span class="tree-title">Exam-Eve Priority Review</span></a>
         <a class="tree-link is-active" href="./"><span class="tree-date">Aug 22</span><span class="tree-title">Exam Review</span></a>
       </nav>
-      <p class="sidebar-note">Use the two question-only booklets as references. Practice Mode saves a draft and checks only after you finish. Answer View creates no attempt.</p>
+      <p class="sidebar-note">Practice gives immediate correction and a grade after submission. Review shows each verified answer inside the original option set and creates no attempt.</p>
     </aside>
 
     <main class="workspace-main exam-main">
@@ -31,19 +31,48 @@
         <div>
           <p class="eyebrow">August SAT</p>
           <h1>0822 Exam Review</h1>
-          <p>Compare the teacher-community question set with what you remember from the August 22 exam. Work from either booklet, record answers in Practice Mode, or open Answer View for a quick reference check.</p>
+          <p>Use the full question pages for answer-checked practice or for a direct review of the verified answers.</p>
         </div>
         <div class="exam-date-card"><span>Review date</span><strong>August 22</strong></div>
       </header>
 
       <aside class="exam-notice">
         <strong>Reference notice</strong>
-        These questions came from a teacher community. They are reconstructions, not official College Board test files, and their overlap with the actual questions you saw on August 22 cannot be guaranteed. Use them only as a reference when reviewing the exam. The answer keys were supplied by the teacher who shared the set and were independently checked by Tina.
+        These questions came from a teacher community. They are reconstructions, not official College Board test files, and their overlap with the actual questions you received on August 22 cannot be guaranteed. Use them only as a reference. The answer key was supplied by the teacher who shared this set and was manually checked by Tina before being used here.
       </aside>
+
+      <section class="exam-section" aria-labelledby="mode-title">
+        <div class="exam-section-heading">
+          <div><h2 id="mode-title">Choose how you want to work</h2><p>Both modes show the original question and all offered options.</p></div>
+          <button class="print-button" type="button" onclick="window.print()">Save as PDF</button>
+        </div>
+
+        <div class="mode-choice-grid">
+          <article class="mode-choice-card practice-card">
+            <span class="mode-kicker">Do the questions</span>
+            <h3>Practice Mode</h3>
+            <p>Select answers on an HM-style question page. When you submit a subject, the page immediately shows your grade, mistakes, and the correct options.</p>
+            <div class="mode-link-list">
+              <a href="practice-reading-writing/"><span><strong>Reading and Writing</strong><small>54 questions</small></span><span aria-hidden="true">→</span></a>
+              <a href="practice-math/"><span><strong>Math</strong><small>44 questions</small></span><span aria-hidden="true">→</span></a>
+            </div>
+          </article>
+
+          <article class="mode-choice-card review-card">
+            <span class="mode-kicker">See verified answers</span>
+            <h3>Review Mode</h3>
+            <p>See each correct answer highlighted inside the full original option set. This mode creates no attempt, score, or completion record.</p>
+            <div class="mode-link-list">
+              <a href="review-reading-writing/"><span><strong>Reading and Writing</strong><small>Answers shown in all 54 questions</small></span><span aria-hidden="true">→</span></a>
+              <a href="review-math/"><span><strong>Math</strong><small>Answers shown in all 44 questions</small></span><span aria-hidden="true">→</span></a>
+            </div>
+          </article>
+        </div>
+      </section>
 
       <section class="exam-section" aria-labelledby="booklet-title">
         <div class="exam-section-heading">
-          <div><h2 id="booklet-title">Question booklets</h2><p>Answer-key pages were removed from these learner copies so Practice Mode stays answer-free until you finish.</p></div>
+          <div><h2 id="booklet-title">Question-only PDF booklets</h2><p>These optional copies contain no answer-key pages.</p></div>
           <span class="exam-count">98 questions</span>
         </div>
         <div class="booklet-grid">
@@ -59,71 +88,7 @@
           </a>
         </div>
       </section>
-
-      <section class="exam-section" aria-labelledby="mode-title">
-        <div class="exam-section-heading">
-          <div><h2 id="mode-title">Choose a review mode</h2><p>Switching modes does not erase a saved Practice draft.</p></div>
-          <button class="print-button" id="exam-save-pdf" type="button">Save as PDF</button>
-        </div>
-
-        <div class="mode-tabs" role="tablist" aria-label="Exam review mode">
-          <button class="mode-tab" id="practice-tab" type="button" role="tab" aria-selected="true" aria-controls="practice-panel" data-mode-tab="practice">Practice Mode</button>
-          <button class="mode-tab" id="answers-tab" type="button" role="tab" aria-selected="false" aria-controls="answers-panel" data-mode-tab="answers" tabindex="-1">Answer View</button>
-        </div>
-
-        <div class="mode-panel" id="practice-panel" role="tabpanel" aria-labelledby="practice-tab" data-mode-panel="practice">
-          <p class="answer-view-intro">Open a booklet, enter answers in its matching sheet, then finish that subject. Blank answers are allowed but count as incorrect. After the checked attempt is accepted, wrong answers and correct answers appear immediately. No explanations are included.</p>
-          <div id="practice-subjects"></div>
-          <p class="mode-note">Autosave is a draft, not a finished attempt. Each subject needs its own deliberate Finish button.</p>
-        </div>
-
-        <div class="mode-panel" id="answers-panel" role="tabpanel" aria-labelledby="answers-tab" data-mode-panel="answers" hidden>
-          <p class="answer-view-intro">Use this for a quick key check without submitting Practice Mode. Clicking Show all answers displays both verified keys. It creates no attempt, score, completion record, or learning-evidence state.</p>
-          <div class="answer-view-actions">
-            <button class="show-answers-button" id="show-all-answers" type="button" aria-expanded="false" aria-controls="answer-view-results">Show all answers</button>
-            <span class="answer-view-status" id="answer-view-status" aria-live="polite">Answers remain hidden until you click.</span>
-          </div>
-          <div class="answer-view-results" id="answer-view-results" hidden></div>
-        </div>
-      </section>
     </main>
   </div>
-
-  <script>
-    window.JOY_EXAM_REVIEW_CONFIG = {
-      subjects: [
-        {
-          key: 'rw',
-          title: 'Reading and Writing',
-          shortTitle: 'Reading and Writing',
-          assignmentId: 'joy-0822-exam-review-reading-writing',
-          assignmentLabel: '0822 Exam Review — Reading and Writing Practice',
-          count: 54,
-          instructions: 'Type A, B, C, or D',
-          numericQuestions: [],
-          sessions: [
-            { label: 'Module 1', start: 1, count: 27 },
-            { label: 'Module 2', start: 28, count: 27 }
-          ]
-        },
-        {
-          key: 'math',
-          title: 'Math',
-          shortTitle: 'Math',
-          assignmentId: 'joy-0822-exam-review-math',
-          assignmentLabel: '0822 Exam Review — Math Practice',
-          count: 44,
-          instructions: 'Use A–D or enter the numeric response shown in the booklet',
-          numericQuestions: [1, 11, 14, 15, 20, 22, 23, 34, 36, 41, 43],
-          sessions: [
-            { label: 'Module 1', start: 1, count: 22 },
-            { label: 'Module 2', start: 23, count: 22 }
-          ]
-        }
-      ]
-    };
-  </script>
-  <script src="../assets/config.js"></script>
-  <script src="../assets/exam-review.js"></script>
 </body>
 </html>
