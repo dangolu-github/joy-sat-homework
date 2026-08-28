@@ -3,6 +3,7 @@
 
   var config = window.JOY_EXAM_QUESTION_CONFIG || {};
   var portalConfig = window.JOY_HOMEWORK_CONFIG || {};
+  var imageVersion = '?v=20260828c';
   var testMode = new URLSearchParams(window.location.search).get('test') === '1';
   var isReview = config.mode === 'review';
   var state = isReview ? null : loadState();
@@ -46,8 +47,8 @@
   function questionMarkup(number, localNumber, moduleLabel) {
     var folder = config.imageBase + '/q' + String(number).padStart(2, '0');
     var prompt = config.key === 'rw'
-      ? '<div class="prompt-grid"><a class="prompt-zoom" href="' + folder + '/prompt-left.webp" target="_blank" rel="noopener" aria-label="Open passage full size"><img class="prompt-image" src="' + folder + '/prompt-left.webp" alt="' + escapeHtml(moduleLabel + ' question ' + localNumber + ' passage') + '" loading="lazy"></a><a class="prompt-zoom" href="' + folder + '/prompt-right.webp" target="_blank" rel="noopener" aria-label="Open question stem full size"><img class="prompt-image" src="' + folder + '/prompt-right.webp" alt="' + escapeHtml(moduleLabel + ' question ' + localNumber + ' stem') + '" loading="lazy"></a></div>'
-      : '<div class="prompt-grid single"><a class="prompt-zoom" href="' + folder + '/prompt.webp" target="_blank" rel="noopener" aria-label="Open question prompt full size"><img class="prompt-image" src="' + folder + '/prompt.webp" alt="' + escapeHtml(moduleLabel + ' question ' + localNumber + ' prompt') + '" loading="lazy"></a></div>';
+      ? '<div class="prompt-grid rw-prompt"><a class="prompt-zoom" href="' + folder + '/prompt-left.webp' + imageVersion + '" target="_blank" rel="noopener" aria-label="Open passage full size"><img class="prompt-image" src="' + folder + '/prompt-left.webp' + imageVersion + '" alt="' + escapeHtml(moduleLabel + ' question ' + localNumber + ' passage') + '" loading="lazy"></a><a class="prompt-zoom" href="' + folder + '/prompt-right.webp' + imageVersion + '" target="_blank" rel="noopener" aria-label="Open question stem full size"><img class="prompt-image" src="' + folder + '/prompt-right.webp' + imageVersion + '" alt="' + escapeHtml(moduleLabel + ' question ' + localNumber + ' stem') + '" loading="lazy"></a></div>'
+      : '<div class="prompt-grid single"><a class="prompt-zoom" href="' + folder + '/prompt.webp' + imageVersion + '" target="_blank" rel="noopener" aria-label="Open question prompt full size"><img class="prompt-image" src="' + folder + '/prompt.webp' + imageVersion + '" alt="' + escapeHtml(moduleLabel + ' question ' + localNumber + ' prompt') + '" loading="lazy"></a></div>';
     var numeric = config.numericQuestions.indexOf(number) !== -1;
     var response = numeric ? numericMarkup(number, moduleLabel, localNumber) : optionsMarkup(number, folder, moduleLabel, localNumber);
     return '<article class="exam-question" id="question-' + number + '" data-question="' + number + '" data-kind="' + (numeric ? 'numeric' : 'choice') + '">' +
@@ -62,7 +63,7 @@
         return '<label class="exam-option" data-option data-number="' + number + '" data-answer="' + answer + '" for="' + inputId + '">' +
           '<input id="' + inputId + '" type="radio" name="answer-' + number + '" value="' + answer + '" data-answer-input data-number="' + number + '"' + (isReview ? ' disabled' : '') + '>' +
           '<span class="visually-hidden">Select option ' + answer + '</span>' +
-          '<img class="option-image" src="' + folder + '/option-' + answer + '.webp" alt="Option ' + answer + ' from the source question" loading="lazy">' +
+          '<img class="option-image" src="' + folder + '/option-' + answer + '.webp' + imageVersion + '" alt="Option ' + answer + ' from the source question" loading="lazy">' +
         '</label>';
       }).join('') + '</div>';
   }
