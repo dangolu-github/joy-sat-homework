@@ -3,7 +3,7 @@
 
   var config = window.JOY_EXAM_QUESTION_CONFIG || {};
   var portalConfig = window.JOY_HOMEWORK_CONFIG || {};
-  var imageVersion = '?v=20260828d';
+  var imageVersion = '?v=20260828e';
   var testMode = new URLSearchParams(window.location.search).get('test') === '1';
   var isReview = config.mode === 'review';
   var state = isReview ? null : loadState();
