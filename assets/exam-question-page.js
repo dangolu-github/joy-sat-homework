@@ -3,7 +3,7 @@
 
   var config = window.JOY_EXAM_QUESTION_CONFIG || {};
   var portalConfig = window.JOY_HOMEWORK_CONFIG || {};
-  var imageVersion = '?v=20260828c';
+  var imageVersion = '?v=20260828d';
   var testMode = new URLSearchParams(window.location.search).get('test') === '1';
   var isReview = config.mode === 'review';
   var state = isReview ? null : loadState();
@@ -63,6 +63,7 @@
         return '<label class="exam-option" data-option data-number="' + number + '" data-answer="' + answer + '" for="' + inputId + '">' +
           '<input id="' + inputId + '" type="radio" name="answer-' + number + '" value="' + answer + '" data-answer-input data-number="' + number + '"' + (isReview ? ' disabled' : '') + '>' +
           '<span class="visually-hidden">Select option ' + answer + '</span>' +
+          '<span class="option-letter" aria-hidden="true">' + answer + '.</span>' +
           '<img class="option-image" src="' + folder + '/option-' + answer + '.webp' + imageVersion + '" alt="Option ' + answer + ' from the source question" loading="lazy">' +
         '</label>';
       }).join('') + '</div>';

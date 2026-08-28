@@ -12,7 +12,7 @@
   --exam-gold-soft: #fff7df;
 }
 
-.exam-question-main { width: 100%; min-width: 0; max-width: 1120px; }
+.exam-question-main { width: 100%; min-width: 0; max-width: 1004px; padding-right: 68px; padding-left: 68px; }
 .question-page-header { display: flex; justify-content: space-between; gap: 24px; align-items: start; margin-bottom: 20px; }
 .question-page-header h1 { margin: 5px 0 9px; color: var(--exam-ink); font-size: clamp(2rem, 4.5vw, 3.15rem); line-height: 1.08; }
 .question-page-header p { max-width: 760px; margin: 0; color: var(--exam-muted); line-height: 1.65; }
@@ -45,21 +45,22 @@ body[data-exam-mode="review"] .mode-pill { background: var(--exam-green-soft); c
 .exam-module-heading { display: flex; justify-content: space-between; gap: 14px; align-items: end; margin: 0 0 14px; padding: 0 4px; }
 .exam-module-heading h2 { margin: 0; color: var(--exam-ink); font-size: 1.35rem; }
 .exam-module-heading span { color: var(--exam-muted); font-size: .84rem; font-weight: 800; }
-.exam-question { scroll-margin-top: 190px; margin-bottom: 20px; padding: 19px; border: 1px solid var(--exam-line); border-radius: 19px; background: #fff; box-shadow: 0 13px 38px rgba(32, 53, 86, .065); }
+.exam-question { scroll-margin-top: 190px; margin-bottom: 20px; padding: 26px; border: 1px solid var(--exam-line); border-radius: 17px; background: #fff; box-shadow: 0 13px 38px rgba(32, 53, 86, .065); }
 .question-label { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 14px; }
 .question-label strong { color: var(--exam-ink); font-size: 1rem; }
 .question-label span { color: var(--exam-muted); font-size: .78rem; font-weight: 750; }
-.prompt-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; margin-bottom: 14px; }
+.prompt-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; margin-bottom: 18px; }
 .prompt-grid.single, .prompt-grid.rw-prompt { grid-template-columns: 1fr; }
 .prompt-zoom { position: relative; display: block; min-width: 0; color: var(--exam-blue); text-decoration: none; }
 .prompt-zoom::after { content: "Open full-size"; position: absolute; right: 8px; bottom: 8px; padding: 5px 8px; border-radius: 8px; background: rgba(23, 35, 58, .82); color: #fff; font-size: .65rem; font-weight: 850; opacity: 0; transition: opacity .15s ease; }
 .prompt-zoom:hover::after, .prompt-zoom:focus-visible::after { opacity: 1; }
 .prompt-image { display: block; width: 100%; max-width: 100%; height: auto; border: 1px solid #e0e5ed; border-radius: 12px; background: #fff; }
-.option-list { display: grid; gap: 10px; }
-.exam-option { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 11px; align-items: center; min-height: 54px; padding: 10px 12px; border: 2px solid #d5ddea; border-radius: 14px; background: #fff; cursor: pointer; transition: border-color .15s ease, box-shadow .15s ease, background .15s ease; }
+.option-list { display: grid; gap: 8px; }
+.exam-option { position: relative; display: grid; grid-template-columns: 20px 25px minmax(0, 1fr); gap: 10px; align-items: center; min-height: 56px; padding: 14px 15px; border: 1px solid #dedbd2; border-radius: 10px; background: #fff; cursor: pointer; transition: border-color .15s ease, box-shadow .15s ease, background .15s ease; }
 .exam-option:hover { border-color: #92afd7; box-shadow: 0 8px 22px rgba(40, 94, 168, .09); }
 .exam-option input { width: 20px; height: 20px; margin: 0; accent-color: var(--exam-blue); }
-.option-image { display: block; width: 100%; height: auto; min-width: 0; }
+.option-letter { color: var(--exam-ink); font-size: 16px; font-weight: 750; line-height: 1; }
+.option-image { display: block; width: auto; max-width: 100%; height: auto; min-width: 0; }
 .exam-option.is-selected { border-color: var(--exam-blue); background: var(--exam-blue-soft); }
 .exam-option.is-correct { border-color: #48a878; background: var(--exam-green-soft); box-shadow: 0 0 0 3px rgba(23, 108, 69, .08); }
 .exam-option.is-wrong { border-color: #d66d78; background: var(--exam-red-soft); }
@@ -76,7 +77,7 @@ body[data-exam-mode="review"] .mode-pill { background: var(--exam-green-soft); c
 .numeric-result { display: block; margin-top: 9px; color: var(--exam-green); font-size: .82rem; font-weight: 850; }
 .numeric-response-shell.is-wrong .numeric-result { color: var(--exam-red); }
 
-.submission-panel { position: sticky; z-index: 4; bottom: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 13px; align-items: center; margin-top: 26px; padding: 17px 18px; border: 1px solid #b9cae1; border-radius: 17px; background: rgba(244, 248, 253, .97); box-shadow: 0 14px 40px rgba(30, 48, 78, .16); backdrop-filter: blur(10px); }
+.submission-panel { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 13px; align-items: center; margin-top: 26px; padding: 17px 18px; border: 1px solid #b9cae1; border-radius: 17px; background: #f4f8fd; box-shadow: 0 14px 40px rgba(30, 48, 78, .12); }
 .submission-copy strong, .submission-copy span { display: block; }
 .submission-copy strong { color: var(--exam-ink); }
 .submission-copy span { margin-top: 4px; color: var(--exam-muted); font-size: .82rem; line-height: 1.4; }
@@ -88,6 +89,7 @@ body[data-exam-mode="review"] .mode-pill { background: var(--exam-green-soft); c
 
 @media (max-width: 760px) {
   .workspace-shell, .workspace-sidebar, .exam-question-main, .question-page-header, .question-toolbar, .exam-module, .exam-question, .prompt-grid, .prompt-grid > *, .option-list, .exam-option { min-width: 0; max-width: 100%; }
+  .exam-question-main { padding-right: 22px; padding-left: 22px; }
   .question-page-header { flex-direction: column; }
   .prompt-grid { grid-template-columns: 1fr; }
   .prompt-zoom::after { opacity: 1; }
@@ -100,9 +102,10 @@ body[data-exam-mode="review"] .mode-pill { background: var(--exam-green-soft); c
   .toolbar-actions { width: 100%; }
   .print-question-button { width: 100%; }
   .question-label { align-items: flex-start; }
-  .exam-option { padding: 8px; grid-template-columns: 18px minmax(0, 1fr); gap: 7px; }
+  .exam-option { grid-template-columns: 18px 22px minmax(0, 1fr); gap: 7px; min-height: 52px; padding: 11px 10px; }
   .exam-option input { width: 18px; height: 18px; }
-  .option-result { position: static; grid-column: 2; justify-self: start; margin-top: 4px; }
+  .option-letter { font-size: 15px; }
+  .option-result { position: static; grid-column: 3; justify-self: start; margin-top: 4px; }
   .submission-panel { align-items: stretch; }
   .submit-exam-button { width: 100%; }
 }
