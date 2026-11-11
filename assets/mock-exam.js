@@ -119,7 +119,7 @@
     state.updatedAt = new Date().toISOString();
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      setStatus('Saved on this device · sending the latest changes to Teacher…', 'saving');
+      setStatus('Saving…', 'saving');
     } catch (error) {
       setStatus('This browser could not save the latest change. Keep this page open and try again.', 'error');
     }
@@ -134,7 +134,7 @@
     clearTimeout(remoteTimer);
     saveLocal();
     if (!config.submissionEndpoint) {
-      setStatus('Saved on this device. The Teacher online answer record is not connected yet.', 'error');
+      setStatus('Saved on this device. Saving online is not available right now.', 'error');
       return;
     }
 
@@ -161,10 +161,10 @@
         })
       });
       if (response.type !== 'opaque' && !response.ok) throw new Error('Save failed');
-      setStatus('Saved for Teacher · ' + answeredCount() + ' of ' + TOTAL + ' answers recorded.', 'success');
+      setStatus('Saved · ' + answeredCount() + ' of ' + TOTAL + ' answers recorded.', 'success');
       if (fromButton) saveButton.textContent = 'Saved';
     } catch (error) {
-      setStatus('Saved on this device. The online copy could not update, so it will retry when you make another change.', 'error');
+      setStatus('Saved on this device. It will be sent again after your next change.', 'error');
       if (fromButton) saveButton.textContent = 'Try save again';
     } finally {
       if (fromButton) saveButton.disabled = false;

@@ -6,8 +6,10 @@
   var imageVersion = '?v=20260828e';
   var testMode = new URLSearchParams(window.location.search).get('test') === '1';
   var isReview = config.mode === 'review';
+  var WAITING_TEXT = 'Submitted. Waiting for your teacher to review.';
   var state = isReview ? null : loadState();
   var saveTimer = null;
+  var waitingTimer = null;
 
   document.body.dataset.examMode = isReview ? 'review' : 'practice';
   renderQuestionPage();
@@ -18,8 +20,31 @@
     restorePracticeState();
     bindPractice();
     updateProgress();
-    if (state.result) renderPracticeResult(state.result, false);
-    else if (state.submittedAt) pollForResult(0);
+    if (state.result) {
+      renderPracticeResult(state.result, false);
+      if (!state.result.checkMode) scheduleWaitingRefresh(0);
+    } else if (state.submittedAt) pollForResult(0);
+  }
+
+  // A submitted result that is waiting for review is fetched again later; it appears once the teacher releases it.
+  function scheduleWaitingRefresh(delay) {
+    clearTimeout(waitingTimer);
+    waitingTimer = setTimeout(function () {
+      if (!state.submissionId) return;
+      jsonp('getGradedResult', { submissionId: state.submissionId, assignmentId: config.assignmentId })
+        .then(function (data) {
+          if (data && data.ok && !data.pending) {
+            var changed = Boolean(data.checkMode) !== Boolean(state.result && state.result.checkMode);
+            state.result = data;
+            saveLocal(data.checkMode ? 'Answers checked.' : WAITING_TEXT, 'success');
+            if (changed) renderPracticeResult(data, false);
+            if (!data.checkMode) scheduleWaitingRefresh(30000);
+            return;
+          }
+          scheduleWaitingRefresh(30000);
+        })
+        .catch(function () { scheduleWaitingRefresh(30000); });
+    }, delay);
   }
 
   function portalAccessToken() {
@@ -147,7 +172,7 @@
     if (answer) state.responses[number] = { answer: answer };
     else delete state.responses[number];
     updateSelectedOption(number);
-    saveLocal('Saved on this device · syncing with Teacher…', '');
+    saveLocal('Saving…', '');
     updateProgress();
     scheduleProgressSave();
   }
@@ -198,9 +223,9 @@
         method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(Object.assign({}, state, { action: 'saveHomeworkProgress', accessToken: portalAccessToken(), saveId: state.submissionId }))
       });
-      setStatus('Saved on this device and synced with Teacher.', 'success');
+      setStatus('Saved.', 'success');
     } catch (error) {
-      setStatus('Saved on this device. Online sync will retry after another change.', 'error');
+      setStatus('Saved on this device. It will be sent after your next change.', 'error');
     }
   }
 
@@ -208,12 +233,12 @@
     if (state.result) return;
     var button = document.getElementById('submit-exam');
     button.disabled = true;
-    button.textContent = 'Checking status…';
+    button.textContent = 'Loading…';
     jsonp('getAssignmentState', { assignmentId: config.assignmentId, environment: state.environment, saveId: state.submissionId })
       .then(function (data) {
         if (data && data.submissionBlocked) {
-          button.textContent = 'Receiving stopped';
-          setStatus('This practice page is read-only. Existing submitted work is preserved.', 'error');
+          button.textContent = 'Page closed';
+          setStatus('This page is closed. Work you already submitted is kept.', 'error');
           return;
         }
         button.disabled = false;
@@ -223,7 +248,7 @@
       .catch(function () {
         button.disabled = false;
         button.textContent = 'Try again';
-        setStatus('Assignment status could not be checked. Try again before submitting.', 'error');
+        setStatus('The page could not connect. Try again before submitting.', 'error');
       });
   }
 
@@ -249,7 +274,7 @@
     state.studentName = enteredName;
     saveLocal('Ready to send.', '');
     if (!portalConfig.submissionEndpoint) {
-      setStatus('Answers remain saved locally. Checking service is unavailable.', 'error');
+      setStatus('Your answers are saved on this device. Submitting is not available right now.', 'error');
       return;
     }
     var button = document.getElementById('submit-exam');
@@ -262,8 +287,8 @@
         body: JSON.stringify(Object.assign({}, state, { action: 'submitExamReview', accessToken: portalAccessToken(), submittedAt: submittedAt }))
       });
       state.submittedAt = submittedAt;
-      saveLocal('Submission sent · loading corrections…', '');
-      button.textContent = 'Loading corrections…';
+      saveLocal('Submitted · loading…', '');
+      button.textContent = 'Loading…';
       pollForResult(0);
     } catch (error) {
       state.submittedAt = null;
@@ -280,16 +305,17 @@
         if (data && data.ok && !data.pending) {
           state.result = data;
           state.submittedAt = data.submittedAt || state.submittedAt;
-          saveLocal('Answers checked and saved in Teacher register.', 'success');
+          saveLocal(data.checkMode ? 'Answers checked.' : WAITING_TEXT, 'success');
           renderPracticeResult(data, true);
+          if (!data.checkMode) scheduleWaitingRefresh(30000);
           return;
         }
         if (attempt < 12) setTimeout(function () { pollForResult(attempt + 1); }, Math.min(900 + attempt * 300, 3000));
-        else resetAfterPollingFailure('No checked result was confirmed. Answers remain saved; try again.');
+        else resetAfterPollingFailure('Your submission was not confirmed. Your answers are still saved; try again.');
       })
       .catch(function () {
         if (attempt < 12) setTimeout(function () { pollForResult(attempt + 1); }, 1700);
-        else resetAfterPollingFailure('Correction service did not respond. Answers remain saved.');
+        else resetAfterPollingFailure('The page could not connect. Your answers are still saved.');
       });
   }
 
@@ -302,24 +328,33 @@
   }
 
   function renderPracticeResult(result, shouldFocus) {
+    var checked = Boolean(result.checkMode && Array.isArray(result.correctAnswers));
     for (var number = 1; number <= config.count; number += 1) {
-      renderQuestionCorrection(number, String((result.answers && result.answers[number - 1]) || ''), String((result.correctAnswers && result.correctAnswers[number - 1]) || ''), result.correctness && result.correctness[number - 1]);
+      if (checked) renderQuestionCorrection(number, String((result.answers && result.answers[number - 1]) || ''), String((result.correctAnswers && result.correctAnswers[number - 1]) || ''), result.correctness && result.correctness[number - 1]);
+      else lockQuestion(number);
     }
     var button = document.getElementById('submit-exam');
     button.disabled = true;
-    button.textContent = result.checkMode ? 'Answers checked' : 'Submitted';
+    button.textContent = checked ? 'Answers checked' : 'Submitted';
     var box = document.getElementById('result-summary');
     box.hidden = false;
-    if (result.checkMode) {
+    if (checked) {
       box.innerHTML = '<strong>' + escapeHtml(result.score) + ' / ' + escapeHtml(result.total) + '</strong><span>' + escapeHtml(result.percent) + '% correct</span><p>Correct answers are highlighted in green. Your incorrect selections are marked in red.</p>';
-    } else box.innerHTML = '<strong>Answers saved</strong><span>Checking is currently unavailable</span>';
-    setStatus(testMode ? 'Teacher test result.' : 'Saved in Teacher register.', 'success');
+    } else box.innerHTML = '<p>' + escapeHtml(WAITING_TEXT) + '</p>';
+    setStatus(testMode ? 'Teacher test result.' : (checked ? 'Answers checked.' : WAITING_TEXT), 'success');
     updateProgress();
     if (shouldFocus) {
       box.scrollIntoView({ behavior: 'smooth', block: 'center' });
       box.setAttribute('tabindex', '-1');
       box.focus({ preventScroll: true });
     }
+  }
+
+  // Submitted but not yet reviewed: keep the learner's own answers, show no correctness.
+  function lockQuestion(number) {
+    var question = document.querySelector('[data-question="' + number + '"]');
+    if (!question) return;
+    Array.from(question.querySelectorAll('[data-answer-input]')).forEach(function (input) { input.disabled = true; });
   }
 
   function renderQuestionCorrection(number, selected, correct, knownCorrect) {
@@ -359,9 +394,9 @@
     }).then(function (data) {
       if (!data || !data.ok || !Array.isArray(data.answers) || data.answers.length !== config.count) throw new Error('Answer key unavailable');
       data.answers.forEach(function (answer, index) { renderReviewAnswer(index + 1, String(answer || '')); });
-      setReviewStatus('All verified answers are shown inside the original option sets. Review Mode created no attempt or score.', 'success');
+      setReviewStatus('All answers are shown inside the original options.', 'success');
     }).catch(function () {
-      setReviewStatus('The verified answers could not be loaded. Check portal access and try reloading this page.', 'error');
+      setReviewStatus('The answers could not be loaded. Please reload this page.', 'error');
     });
   }
 

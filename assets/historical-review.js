@@ -49,11 +49,11 @@
     status.textContent = data.checkReleased
       ? (data.explainReleased
         ? 'Your archived answers, corrections, and English explanations are shown together below.'
-        : 'Your archived answers and corrections are shown below. Explanation is not currently released.')
-      : 'Your archived answers are shown below. Corrections remain hidden until the Teacher enables Check.';
+        : 'Your archived answers and corrections are shown below.')
+      : 'Your archived answers are shown below.';
 
     if (!data.checkReleased) {
-      target.innerHTML = '<div class="historical-notice">Check is currently off. Your recorded choices remain visible without correctness.</div>';
+      target.innerHTML = '<div class="historical-notice">Submitted. Waiting for your teacher to review.</div>';
     } else if (typeof data.correctCount === 'number') {
       target.innerHTML = '<section class="historical-summary"><div class="historical-score">'
         + escapeHtml(data.correctCount + ' / ' + data.questionCount)

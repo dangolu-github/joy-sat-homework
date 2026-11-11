@@ -54,7 +54,7 @@
   function setAssignmentCheckingState() {
     var button = document.getElementById('portal-submit');
     button.disabled = true;
-    button.textContent = 'Checking assignment status…';
+    button.textContent = 'Loading…';
   }
 
   function startNormalPage() {
@@ -109,7 +109,7 @@
     state.result = null;
     try { localStorage.setItem(storageKey, JSON.stringify(state)); } catch (error) {}
     document.body.classList.add('portal-archived');
-    document.getElementById('portal-save').textContent = 'Receiving stopped · completed submission preserved';
+    document.getElementById('portal-save').textContent = 'Read-only · your submitted work is kept';
     lockSubmittedPage();
     pollForResult(0);
   }
@@ -122,11 +122,11 @@
       Array.from(question.querySelectorAll('input, textarea')).forEach(function (field) { field.disabled = true; });
     });
     var copy = document.getElementById('portal-submit-copy');
-    copy.innerHTML = '<h2>Receiving stopped</h2><p>The Teacher is no longer receiving new work for this page. Existing submitted work is preserved, but new answers and submissions are disabled.</p>';
+    copy.innerHTML = '<h2>This page is closed</h2><p>New answers can no longer be sent on this page. Work you already submitted is kept.</p>';
     var button = document.getElementById('portal-submit');
     button.disabled = true;
-    button.textContent = 'Receiving stopped — page is read-only';
-    document.getElementById('portal-save').textContent = 'Read-only · receiving stopped';
+    button.textContent = 'Page closed';
+    document.getElementById('portal-save').textContent = 'Read-only';
     document.getElementById('difficulty-panel').hidden = true;
   }
 
@@ -246,7 +246,7 @@
     difficulty.id = 'difficulty-panel';
     difficulty.hidden = true;
     difficulty.innerHTML =
-      '<div><span class="result-kicker">Your review list</span><h2>Which questions felt particularly difficult?</h2><p>Tick any question you want the Teacher to explain or train again. You can change this list later on this device.</p></div>' +
+      '<div><span class="result-kicker">Your review list</span><h2>Which questions felt particularly difficult?</h2><p>Tick any question you want your teacher to explain or train again. You can change this list later on this device.</p></div>' +
       '<div class="difficulty-grid" id="difficulty-grid"></div><div class="difficulty-status" id="difficulty-status">Changes save automatically.</div>';
     document.body.appendChild(difficulty);
 
@@ -288,7 +288,7 @@
           }).join('') +
         '</div>';
     }, function () {
-      renderTeacherAnswerError('This Teacher answer link is unavailable or has expired. Reopen it from the Teacher Dashboard.');
+      renderTeacherAnswerError('This Teacher answer link is unavailable. Reopen it from the Teacher Dashboard.');
     });
 
     function renderTeacherAnswerError(message) {
@@ -337,7 +337,7 @@
     state.updatedAt = new Date().toISOString();
     try {
       localStorage.setItem(storageKey, JSON.stringify(state));
-      document.getElementById('portal-save').textContent = submitted ? 'Saved on this device' : 'Saved on this device · syncing with Teacher…';
+      document.getElementById('portal-save').textContent = submitted ? 'Saved' : 'Saving…';
       if (!submitted && hasProgress()) scheduleProgressSync(false);
     } catch (error) {
       document.getElementById('portal-save').textContent = 'Unable to save';
@@ -380,7 +380,7 @@
       if (response.type !== 'opaque' && !response.ok) throw new Error('Progress sync failed');
       verifyProgressSync(clientUpdatedAt, 0);
     } catch (error) {
-      document.getElementById('portal-save').textContent = 'Saved on this device · online sync will retry';
+      document.getElementById('portal-save').textContent = 'Saved on this device · will send when you are online';
     }
   }
 
@@ -388,14 +388,14 @@
     if (archiveMode) return;
     jsonp('getHomeworkProgress', { saveId: state.submissionId, assignmentId: assignmentId }, function (data) {
       if (data && data.ok && !data.pending && data.clientUpdatedAt === clientUpdatedAt) {
-        document.getElementById('portal-save').textContent = 'Saved on this device and with Teacher';
+        document.getElementById('portal-save').textContent = 'Saved';
         return;
       }
       if (attempt < 3) setTimeout(function () { verifyProgressSync(clientUpdatedAt, attempt + 1); }, 800 + attempt * 500);
-      else document.getElementById('portal-save').textContent = 'Saved on this device · online sync pending';
+      else document.getElementById('portal-save').textContent = 'Saved on this device';
     }, function () {
       if (attempt < 3) setTimeout(function () { verifyProgressSync(clientUpdatedAt, attempt + 1); }, 1200);
-      else document.getElementById('portal-save').textContent = 'Saved on this device · online sync pending';
+      else document.getElementById('portal-save').textContent = 'Saved on this device';
     });
   }
 
@@ -424,7 +424,7 @@
     }
     var button = document.getElementById('portal-submit');
     button.disabled = true;
-    button.textContent = 'Checking assignment status…';
+    button.textContent = 'Loading…';
     jsonp('getAssignmentState', {
       assignmentId: assignmentId,
       environment: 'production',
@@ -441,7 +441,7 @@
     }, function () {
       button.disabled = false;
       button.textContent = 'Try again';
-      showMessage('The assignment status could not be verified. Please try again before submitting.');
+      showMessage('The page could not connect. Please try again before submitting.');
     });
   }
 
@@ -478,7 +478,7 @@
     saveState();
 
     if (!config.submissionEndpoint) {
-      showMessage('Your answers and name are saved. The Teacher submission connection is being activated; please keep this page open on this device.');
+      showMessage('Your answers and name are saved on this device. Submitting is not available yet; please try again later.');
       return;
     }
 
@@ -512,7 +512,7 @@
     });
     var button = document.getElementById('portal-submit');
     button.disabled = true;
-    button.textContent = submittedReviewMode ? 'Loading submitted review…' : (progressReviewMode ? 'Read-only live view' : 'Loading submission status…');
+    button.textContent = submittedReviewMode ? 'Loading submitted review…' : (progressReviewMode ? 'Read-only live view' : 'Loading…');
   }
 
   function pollForResult(attempt) {
@@ -569,7 +569,7 @@
     button.disabled = false;
     button.textContent = 'Try sending again';
     saveState();
-    showMessage('No submitted result was confirmed. Your work is still saved; try again or ask the Teacher whether receiving has been stopped for this homework.');
+    showMessage('Your submission was not confirmed. Your work is still saved; please try again or ask your teacher.');
   }
 
   function pollForProgressReview(attempt) {
@@ -709,9 +709,9 @@
     });
     var resultBox = document.getElementById('portal-result');
     resultBox.hidden = false;
-    resultBox.innerHTML = '<span class="result-kicker">Check mode is on</span><div class="result-score"><strong>' + result.score + ' / ' + result.total + '</strong><span>' + result.percent + '% correct</span></div><p>Submitted as <strong>' + escapeHtml(result.studentName || state.studentName) + '</strong>. The correct choice is highlighted for every question. Mark anything you want to review with the Teacher below.</p>';
+    resultBox.innerHTML = '<span class="result-kicker">Your result</span><div class="result-score"><strong>' + result.score + ' / ' + result.total + '</strong><span>' + result.percent + '% correct</span></div><p>Submitted as <strong>' + escapeHtml(result.studentName || state.studentName) + '</strong>. The correct choice is highlighted for every question. Mark anything you want to review with your teacher below.</p>';
     document.getElementById('portal-submit-copy').hidden = true;
-    document.getElementById('portal-unanswered').textContent = submittedReviewMode ? 'Read-only submitted review' : (testMode ? 'Teacher test record' : 'Saved in Teacher register');
+    document.getElementById('portal-unanswered').textContent = submittedReviewMode ? 'Read-only submitted review' : (testMode ? 'Teacher test record' : 'Submitted');
     document.getElementById('portal-submit').textContent = submittedReviewMode ? 'Read-only submitted review' : 'Answers checked';
     updateProgress();
     if (submittedReviewMode) renderSubmittedDifficultyFlags(result.difficultyFlags || []);
@@ -736,10 +736,10 @@
   function renderUncheckedResult(result) {
     var resultBox = document.getElementById('portal-result');
     resultBox.hidden = false;
-    resultBox.innerHTML = '<span class="result-kicker">Submitted</span><div class="result-score"><strong>Answers saved</strong><span>Check mode is off</span></div><p>Your work has reached the Teacher. Scores, correct answers, and mistake explanations will appear here only after Check mode is turned on.</p>';
+    resultBox.innerHTML = '<span class="result-kicker">Your work</span><p>Submitted. Waiting for your teacher to review.</p>';
     document.getElementById('portal-submit-copy').hidden = true;
-    document.getElementById('portal-unanswered').textContent = submittedReviewMode ? 'Read-only submitted work' : (testMode ? 'Teacher test record' : 'Saved in Teacher register');
-    document.getElementById('portal-submit').textContent = 'Submitted — waiting for Check mode';
+    document.getElementById('portal-unanswered').textContent = submittedReviewMode ? 'Read-only submitted work' : (testMode ? 'Teacher test record' : 'Submitted');
+    document.getElementById('portal-submit').textContent = 'Submitted';
     updateProgress();
     if (submittedReviewMode) renderSubmittedDifficultyFlags(result.difficultyFlags || []);
     else {
@@ -817,10 +817,10 @@
       return number >= 1 && number <= questions.length;
     });
     panel.hidden = false;
-    panel.innerHTML = '<div><span class="result-kicker">Joy’s submitted review list</span><h2>' +
-      (numbers.length ? 'Questions Joy ticked for review' : 'No questions were ticked for review') +
+    panel.innerHTML = '<div><span class="result-kicker">Submitted review list</span><h2>' +
+      (numbers.length ? 'Questions ticked for review' : 'No questions were ticked for review') +
       '</h2><p>' + (numbers.length ? numbers.map(function (number) { return 'Question ' + number; }).join(', ') :
-      'The Google tracker contains no active ticked-question record for this submission.') + '</p></div>';
+      'No question was ticked for this submission.') + '</p></div>';
   }
 
   function installDifficultyChoices() {
@@ -854,9 +854,9 @@
         method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'saveDifficultyFlags', accessToken: portalAccessToken(), assignmentId: assignmentId, submissionId: state.submissionId, studentName: state.studentName, environment: state.environment, flags: state.difficultyFlags || {} })
       });
-      document.getElementById('difficulty-status').textContent = 'Review list saved for Teacher.';
+      document.getElementById('difficulty-status').textContent = 'Review list saved.';
     } catch (error) {
-      document.getElementById('difficulty-status').textContent = 'Saved on this device; online sync will retry after your next change.';
+      document.getElementById('difficulty-status').textContent = 'Saved on this device; it will be sent after your next change.';
     }
   }
 
